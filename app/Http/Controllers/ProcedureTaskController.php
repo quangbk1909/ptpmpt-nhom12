@@ -64,7 +64,7 @@ class ProcedureTaskController extends Controller
     		$procedureTask->creator = $request->creator;
 
     		$procedureTask->save();
-    		return response()->json(['message' => 'Create task successfully!'],201);
+    		return response()->json(['message' => 'Create task successfully!'],200);
     	}
 
     }
