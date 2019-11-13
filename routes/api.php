@@ -30,8 +30,15 @@ Route::put('procedure/{id}', 'ProcedureController@update');
 // xoa quy trinh
 Route::delete('procedure/{id}', 'ProcedureController@delete');
 
+//Main task route
+//Cac task chinh theo quy trinh duoc theo doi boi ban lanh dao
+Route::group(['prefix' => 'main-task'], function() {
+    
+
+}
 
 // Procedure task route
+// Cac task nho trong moi main task duoc theo doi boi nguoi tao va nguoi thuc hien
 Route::group(['prefix' => 'procedure-task'], function() {
     // lay cong viec duoc tao boi user
     Route::get('created-by-user/{userID}', 'ProcedureTaskController@getTasksCreated');

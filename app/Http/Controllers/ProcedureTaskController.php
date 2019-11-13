@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Procedure;
 use App\ProcedureTask;
+use App\MainTask;
 use Illuminate\Http\Request;
 
 class ProcedureTaskController extends Controller
@@ -12,8 +13,8 @@ class ProcedureTaskController extends Controller
 		$procedureTasks = ProcedureTask::where('creator','=',$userID)->orderBy('created_at', 'desc')->get();
 		$tasks = array();
 		foreach ($procedureTasks as $task) {
-    		$procedure = $task->procedure;
-    		unset($task['procedure_id']);
+    		$mainTask = $task->mainTask;
+    		unset($task['main_task_id']);
     		array_push($tasks , $task);
     	}
 
@@ -25,8 +26,8 @@ class ProcedureTaskController extends Controller
 		$procedureTasks = ProcedureTask::where('implementer','=',$userID)->orderBy('created_at', 'desc')->get();
 		$tasks = array();
 		foreach ($procedureTasks as $task) {
-    		$procedure = $task->procedure;
-    		unset($task['procedure_id']);
+    		$mainTask = $task->mainTask;
+    		unset($task['main_task_id']);
     		array_push($tasks , $task);
     	}
 
@@ -37,7 +38,9 @@ class ProcedureTaskController extends Controller
 	public function showDetail($id){
 		$task = ProcedureTask::find($id);
     	if ($task){
-    		$procedure = $task->procedure;
+    		$mainTask = $task->mainTask;
+    		$procedure = $mainTask->procedure;
+    		$procedureType = $procedure->procedureType;
     		// Call api to get info creator of task
     		// Call api to get info implementer of task
 
@@ -49,10 +52,10 @@ class ProcedureTaskController extends Controller
 
 
     public function create(Request $request){
-    	$procedure = Procedure::find($request->procedure_id);
+    	$mainTask = MainTask::find($request->main_task_id);
     	// call api check user exist with id creator
-    	if(!$procedure) {
-    		return response()->json(['message' => 'Procedure  does not exist!']);
+    	if(!$mainTask) {
+    		return response()->json(['message' => 'Main task  does not exist!']);
     	} else if(0){
     		return response()->json(['message' => 'The user who created this task  does not exist!']);
     	} else {
@@ -60,7 +63,7 @@ class ProcedureTaskController extends Controller
     		$procedureTask->name = $request->name;
     		$procedureTask->content = $request->content;
     		$procedureTask->amount_of_work = $request->amount_of_work;
-    		$procedureTask->procedure_id = $request->procedure_id;
+    		$procedureTask->main_task_id = $request->main_task_id;
     		$procedureTask->creator = $request->creator;
 
     		$procedureTask->save();
@@ -70,10 +73,10 @@ class ProcedureTaskController extends Controller
     }
 
     public function update(Request $request, $id){
-    	$procedure = Procedure::find($request->procedure_id);
+    	$mainTask = MainTask::find($request->main_task_id);
     	// call api check user exist with id creator
-    	if(!$procedure) {
-    		return response()->json(['message' => 'Procedure  does not exist!']);
+    	if(!$mainTask) {
+    		return response()->json(['message' => 'Main task  does not exist!']);
     	} else if(0){
     		return response()->json(['message' => 'The user who created this task  does not exist!']);
     	} else {
@@ -81,7 +84,6 @@ class ProcedureTaskController extends Controller
     		$procedureTask->name = $request->name;
     		$procedureTask->content = $request->content;
     		$procedureTask->amount_of_work = $request->amount_of_work;
-    		$procedureTask->procedure_id = $request->procedure_id;
 
     		$procedureTask->save();
     		return response()->json(['message' => 'The task was updated!'],200);
