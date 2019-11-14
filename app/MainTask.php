@@ -13,7 +13,7 @@ class MainTask extends Model
     }
 
 
-    public function procedure_tasks(){
+    public function procedureTasks(){
     	return $this->hasMany('App\ProcedureTask','main_task_id', 'id');
     }
 

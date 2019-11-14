@@ -33,9 +33,23 @@ Route::delete('procedure/{id}', 'ProcedureController@delete');
 //Main task route
 //Cac task chinh theo quy trinh duoc theo doi boi ban lanh dao
 Route::group(['prefix' => 'main-task'], function() {
-    
+    // lay danh sach cac main task theo quy trinh
+    Route::get('','MainTaskController@show');
+    // Lay chi tiet thong tin theo id
+    Route::get('{id}','MainTaskController@showDetail');
+    // Lay danh sach cac proceduretask nho trong maintask
+    Route::get('{id}/procedure-tasks','MainTaskController@getProcedureTasks');
+    // Them main task
+    Route::post('','MainTaskController@create');
+    // sua main task
+    Route::put('{id}','MainTaskController@update');
+    // xoa main task
+    Route::delete('{id}','MainTaskController@delete');
+    // danh dau hoan thanh task
+    Route::put('finish/{id}','MainTaskController@finish');
 
-}
+
+});
 
 // Procedure task route
 // Cac task nho trong moi main task duoc theo doi boi nguoi tao va nguoi thuc hien
@@ -47,7 +61,7 @@ Route::group(['prefix' => 'procedure-task'], function() {
     // lay thong tin chi tiet 1 cong viec
     Route::get('{id}' ,'ProcedureTaskController@showDetail');
     // lay danh sach cac cong viec trong 1 quy trinh
-    Route::get('task-in-procedure', 'ProcedureTaskController@getTaskInProcedure');
+    //Route::get('task-in-procedure', 'ProcedureTaskController@getTaskInProcedure');
     // them mot quy trinh moi
     Route::post('', 'ProcedureTaskController@create');
     // sua noi dung 1 cong viec
@@ -61,8 +75,9 @@ Route::group(['prefix' => 'procedure-task'], function() {
     // danh dau nhiem vu da hoan thanh
     Route::put('done/{id}', 'ProcedureTaskController@markTaskDone');
 
-
 });
+
+Route::put('swap-step-task', 'ProcedureTaskController@swapStep');
 
 
 

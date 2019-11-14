@@ -71,20 +71,6 @@ class ProcedureController extends Controller
         		$procedure->procedure_type_id = $request->procedure_type_id;
         		$procedure->content = $request->content;
         		$procedure->added_by = $request->added_by;
-        		$procedure->attached_file = $request->attached_file;
-
-        		// xử lý khi có file gửi thực tế
-        		/*if($file = $request->file('attached_file')){
-		    		$name = 'file_'.$procedure->id.'.'.$file->getClientOriginalExtension();
-		    		$procedure->attached_file = 'assets/'.$name;
-
-		    		if (File::exists($procedure->attached_file)) {
-		    			File::delete($procedure->attached_file);
-		    			$file->move('assets',$name);
-		    		} else {
-		    			$file->move('assets',$name);    			
-		    		}
-		    	}*/
 		    	$procedure->save();
         		return response()->json(['message' => 'Create procedure successfully!'], 201);
         	}        	
@@ -117,20 +103,6 @@ class ProcedureController extends Controller
 		    		$procedure->title = $request->title;
 		    		$procedure->procedure_type_id = $request->procedure_type_id;
 		    		$procedure->content = $request->content;
-		    		$procedure->attached_file = $request->attached_file;
-
-		    		// xử lý khi có file gửi thực tế
-		    		/*if($file = $request->file('attached_file')){
-			    		$name = 'file_'.$procedure->id.'.'.$file->getClientOriginalExtension();
-			    		$procedure->attached_file = 'assets/'.$name;
-
-			    		if (File::exists($procedure->attached_file)) {
-			    			File::delete($procedure->attached_file);
-			    			$file->move('assets',$name);
-			    		} else {
-			    			$file->move('assets',$name);    			
-			    		}
-			    	}*/
 			    	$procedure->save();
 		    		return response()->json(['message' => 'Update procedure successfully!'], 200);
 	    		}        	

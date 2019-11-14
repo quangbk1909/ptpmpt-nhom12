@@ -53,6 +53,7 @@ class ProcedureTaskController extends Controller
 
     public function create(Request $request){
     	$mainTask = MainTask::find($request->main_task_id);
+        $lastStep = ProcedureTask::where('main_task_id','=',$request->main_task_id)->orderBy('step', 'desc')->first();
     	// call api check user exist with id creator
     	if(!$mainTask) {
     		return response()->json(['message' => 'Main task  does not exist!']);
@@ -66,6 +67,11 @@ class ProcedureTaskController extends Controller
     		$procedureTask->main_task_id = $request->main_task_id;
     		$procedureTask->creator = $request->creator;
 
+            if (!$lastStep) {
+                $procedureTask->step = 1;
+            } else {
+                $procedureTask->step = $lastStep->step + 1;
+            }
     		$procedureTask->save();
     		return response()->json(['message' => 'Create task successfully!'],200);
     	}
@@ -81,12 +87,17 @@ class ProcedureTaskController extends Controller
     		return response()->json(['message' => 'The user who created this task  does not exist!']);
     	} else {
     		$procedureTask = ProcedureTask::find($id);
-    		$procedureTask->name = $request->name;
-    		$procedureTask->content = $request->content;
-    		$procedureTask->amount_of_work = $request->amount_of_work;
+            if(!$procedureTask) {
+                return response()->json(['message' => 'Procedure task  does not exist!']);
+            } else {
+                $procedureTask->name = $request->name;
+                $procedureTask->content = $request->content;
+                $procedureTask->amount_of_work = $request->amount_of_work;
 
-    		$procedureTask->save();
-    		return response()->json(['message' => 'The task was updated!'],200);
+                $procedureTask->save();
+                return response()->json(['message' => 'The task was updated!'],200);
+            }
+    		
     	}
     }
 
@@ -95,7 +106,12 @@ class ProcedureTaskController extends Controller
     	if (!$procedureTask) {
     		return response()->json(['message' => 'The task  does not exist!']);
     	} else {
+            $step = $procedureTask->step;
     		$procedureTask->delete();
+            $stepAfter = ProcedureTask::where('step','>',$step)->get();
+            foreach ($stepAfter as $task) {
+                $task->step -= 1;
+            }
     		return response()->json(['message' => 'The task  was deleted!']);
     	}
     }
@@ -146,6 +162,24 @@ class ProcedureTaskController extends Controller
 
     		
     	}	
+    }
+
+    public function swapStep(Request $request){
+        $firstTask = ProcedureTask::find($request->first_task_id);
+        $secondTask = ProcedureTask::find($request->second_task_id);
+
+        if (!$firstTask) {
+            return response()->json(['message' => 'The first task  does not exist!']);
+        } else if (!$secondTask) {
+            return response()->json(['message' => 'The second task  does not exist!']);
+        } else {
+            $temp = $firstTask->step;
+            $firstTask->step = $secondTask->step;
+            $secondTask->step = $temp;
+            $firstTask->save();
+            $secondTask->save();
+            return response()->json(['message' => 'Swap step between two task successfully!']);
+        }
     }
 
 
