@@ -22,6 +22,15 @@ class MainTaskController extends Controller
 		return response()->json($tasks, 200);
 	}
 
+	public function getMainTaskByProcedure($id){
+		$procedure = Procedure::find($id);
+		if (!$procedure) {
+			return response()->json (['message' => 'Procedure does not exist!']);
+		} else {
+			return response()->json ($procedure->mainTasks);
+		}
+	}
+
 
 	public function showDetail($id){
 		$mainTask = MainTask::find($id);
@@ -36,6 +45,7 @@ class MainTaskController extends Controller
     		return response()->json (['message' => 'Main task does not exist!']);
     	}
 	}
+
 
 
 	public function getProcedureTasks($id){

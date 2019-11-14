@@ -33,6 +33,9 @@ Route::delete('procedure/{id}', 'ProcedureController@delete');
 //Main task route
 //Cac task chinh theo quy trinh duoc theo doi boi ban lanh dao
 Route::group(['prefix' => 'main-task'], function() {
+
+    // lay cac main task theo 1 procedure
+    Route::get('procedure/{id}','MainTaskController@getMainTaskByProcedure');
     // lay danh sach cac main task theo quy trinh
     Route::get('','MainTaskController@show');
     // Lay chi tiet thong tin theo id
