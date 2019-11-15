@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Log;
 use App\Procedure;
 use App\ProcedureType;
 use Illuminate\Http\Request;
@@ -72,6 +73,11 @@ class ProcedureController extends Controller
         		$procedure->content = $request->content;
         		$procedure->added_by = $request->added_by;
 		    	$procedure->save();
+
+                $log = new Log;
+                $log->action = 'User id '. $request->added_by . ' create new procedure'; 
+                $log->save();
+
         		return response()->json(['message' => 'Create procedure successfully!'], 201);
         	}        	
         }

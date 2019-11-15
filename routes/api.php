@@ -82,5 +82,6 @@ Route::group(['prefix' => 'procedure-task'], function() {
 
 Route::put('swap-step-task', 'ProcedureTaskController@swapStep');
 
+Route::get('procedure-log','LogController@getLogs');
 
 
