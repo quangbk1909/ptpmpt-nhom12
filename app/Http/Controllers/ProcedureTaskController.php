@@ -7,6 +7,7 @@ use App\ProcedureTask;
 use App\MainTask;
 use Illuminate\Http\Request;
 
+
 class ProcedureTaskController extends Controller
 {
 	public function getTasksCreated($userID){
@@ -182,5 +183,27 @@ class ProcedureTaskController extends Controller
         }
     }
 
+    public function getList(Request $request){
+        $ids = $request->id;
+        $data = array();
 
+        if(!$ids){
+            return response()->json(['message' => 'No id or list id to get procedure task']);
+        } else {
+            foreach ($ids as $id) {
+                $task = ProcedureTask::find($id);
+                if(!$task){
+                    $task_info = array('id' => $id,
+                                        'data' => 'There is no task corresponding to id!');
+                    array_push($data, $task_info);
+                } else {
+                    $task_info = array('id' => $id,
+                                        'data' => $task);
+                    array_push($data, $task_info);
+                }
+            }
+            return response()->json($data);
+        }
+        
+    }
 }

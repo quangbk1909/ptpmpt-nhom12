@@ -11,4 +11,12 @@ class LogController extends Controller
     	$logs = Log::all();
     	return response()->json($logs); 
     }
+
+
+    public function testJson(Request $request){
+    	$data = json_decode($request->getContent());
+
+    	return $data->name;
+
+    }
 }

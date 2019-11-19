@@ -77,11 +77,18 @@ Route::group(['prefix' => 'procedure-task'], function() {
     Route::put('update-progress/{id}', 'ProcedureTaskController@updateProgress');
     // danh dau nhiem vu da hoan thanh
     Route::put('done/{id}', 'ProcedureTaskController@markTaskDone');
+    // danh sach task theo danh sach id
+    Route::get('','ProcedureTaskController@getList');
 
 });
 
 Route::put('swap-step-task', 'ProcedureTaskController@swapStep');
 
-Route::get('procedure-log','LogController@getLogs');
+Route::get('logs','LogController@getLogs');
+
+Route::put('test','LogController@testJson');
+
+
+
 
 
