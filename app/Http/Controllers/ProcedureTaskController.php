@@ -6,6 +6,8 @@ use App\Procedure;
 use App\ProcedureTask;
 use App\MainTask;
 use Illuminate\Http\Request;
+use GuzzleHttp\Client;
+use App\Log;
 
 
 class ProcedureTaskController extends Controller
@@ -42,8 +44,27 @@ class ProcedureTaskController extends Controller
     		$mainTask = $task->mainTask;
     		$procedure = $mainTask->procedure;
     		$procedureType = $procedure->procedureType;
-    		// Call api to get info creator of task
-    		// Call api to get info implementer of task
+            if ($task->creator != null) {
+                $creator = $this->getUser($task->creator);
+                if ($creator){
+                    $task->creator = $creator;
+                } else {
+                     $task->creator = "User does not exist";
+                }
+            } else {
+                $task->creator = null;
+            }
+
+            if ($task->implementer != null) {
+                $implementer = $this->getUser($task->implementer);
+                if ($implementer){
+                    $task->implementer = $implementer;
+                } else {
+                     $task->implementer = "User does not exist";
+                }
+            } else {
+                $task->implementer = null;
+            }
 
     		return response()->json ($task);
     	} else {
@@ -74,7 +95,12 @@ class ProcedureTaskController extends Controller
                 $procedureTask->step = $lastStep->step + 1;
             }
     		$procedureTask->save();
-    		return response()->json(['message' => 'Create task successfully!'],200);
+
+            $log = new Log;
+            $log->action = 'User id '. $request->user_id . ' create new procedure task '; 
+            $log->save();
+
+    		return response()->json(['message' => 'Create task successfully!','task' => $procedureTask],200);
     	}
 
     }
@@ -96,7 +122,12 @@ class ProcedureTaskController extends Controller
                 $procedureTask->amount_of_work = $request->amount_of_work;
 
                 $procedureTask->save();
-                return response()->json(['message' => 'The task was updated!'],200);
+
+                $log = new Log;
+                $log->action = 'User id '. $request->user_id . ' update  procedure task id-'.$id; 
+                $log->save();
+
+                return response()->json(['message' => 'The task was updated!','task' => $procedureTask],200);
             }
     		
     	}
@@ -113,6 +144,11 @@ class ProcedureTaskController extends Controller
             foreach ($stepAfter as $task) {
                 $task->step -= 1;
             }
+
+            $log = new Log;
+            $log->action = 'User id '. $request->user_id . ' delete  procedure task id-'.$id; 
+            $log->save();
+
     		return response()->json(['message' => 'The task  was deleted!']);
     	}
     }
@@ -121,16 +157,23 @@ class ProcedureTaskController extends Controller
     public function assignTask(Request $request, $id){
     	$procedureTask = ProcedureTask::find($id);
 
-    	// call api get check user by $request->implementer
+    	$implementer = $this->getUser($request->implementer);
     	if (!$procedureTask) {
     		return response()->json(['message' => 'The task  does not exist!']);
-    	} else {
+    	} else if (!$implementer){
+            return response()->json(['message' => 'The user who be assigned does not exist!']);
+        } else {
+
     		$procedureTask->implementer = $request->implementer;
 	    	$procedureTask->deadline = $request->deadline;
 
 	    	$procedureTask->save();
 
-	    	return response()->json(['message' => 'Assign user for task successfully!']);
+            $log = new Log;
+            $log->action = 'User id '. $request->user_id . ' assign user for procedure task id-'.$id; 
+            $log->save();
+
+	    	return response()->json(['message' => 'Assign user for task successfully!','task' => $procedureTask]);
     	}
     	
     }
@@ -143,7 +186,12 @@ class ProcedureTaskController extends Controller
     	} else {
     		$procedureTask->amount_of_accomplished_work = $request->amount_of_accomplished_work;
 	    	$procedureTask->save();
-	    	return response()->json(['message' => 'Update progress of task successfully!']);
+
+            $log = new Log;
+            $log->action = 'User id '. $request->user_id . ' update progress of  procedure task id-'.$id; 
+            $log->save();
+
+	    	return response()->json(['message' => 'Update progress of task successfully!','task' => $procedureTask]]);
     	}	
     }
 
@@ -158,7 +206,12 @@ class ProcedureTaskController extends Controller
     		} else {
     			$procedureTask->status = 1;
 		    	$procedureTask->save();
-		    	return response()->json(['message' => 'Mark task been done  successfully!']);
+
+                $log = new Log;
+                $log->action = 'User id '. $request->user_id . ' mark done procedure task id-'.$id; 
+                $log->save();
+
+		    	return response()->json(['message' => 'Mark task been done  successfully!','task' => $procedureTask]]);
     		}
 
     		
@@ -205,5 +258,18 @@ class ProcedureTaskController extends Controller
             return response()->json($data);
         }
         
+    }
+
+    public function getUser($id){
+        $client = new Client(['base_uri' => 'https://dsd05-dot-my-test-project-252009.appspot.com',]);
+        try {
+            $response = $client->request('GET','/user/getUserInfo?id='.$id);
+            $body = $response->getBody();
+            return json_decode($body);
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            if($e->getResponse()->getStatusCode() != 200) {
+                return false;
+            }
+        }
     }
 }

@@ -86,7 +86,16 @@ Route::put('swap-step-task', 'ProcedureTaskController@swapStep');
 
 Route::get('logs','LogController@getLogs');
 
-Route::put('test','LogController@testJson');
+Route::get('test','LogController@testGuzz');
+
+
+Route::group(['prefix'=>'configuration-management'], function() {
+
+    Route::get('task-field', 'ConfigurationManagementController@getFieldsOfTask');
+    Route::post('template','ConfigurationManagementController@createTemplate');
+    Route::get('template/{id}', 'ConfigurationManagementController@getTemplate');
+    Route::put('template/{id}', 'ConfigurationManagementController@updateTemplate');
+});
 
 
 

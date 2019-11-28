@@ -7,6 +7,8 @@ use App\MainTask;
 use App\ProcedureTask;
 use App\Procedure;
 use Validator;
+use GuzzleHttp\Client;
+use App\Log;
 
 class MainTaskController extends Controller
 {
@@ -37,8 +39,28 @@ class MainTaskController extends Controller
     	if ($mainTask){
     		$procedure = $mainTask->procedure;
     		$procedureType = $procedure->procedureType;
-    		// Call api to get info creator of task
-    		// Call api to get info responsible person of task
+    		if ($mainTask->creator != null) {
+                $creator = $this->getUser($mainTask->creator);
+                if ($creator){
+                    $mainTask->creator = $creator;
+                } else {
+                     $mainTask->creator = "User does not exist";
+                }
+            } else {
+                $mainTask->creator = null;
+            }
+
+            if ($mainTask->responsible_person != null) {
+                $responsible_person = $this->getUser($mainTask->responsible_person);
+                if ($responsible_person){
+                    $mainTask->responsible_person = $responsible_person;
+                } else {
+                     $mainTask->responsible_person = "User does not exist";
+                }
+            } else {
+                $mainTask->responsible_person = null;
+            }
+
 
     		return response()->json ($mainTask);
     	} else {
@@ -84,7 +106,12 @@ class MainTaskController extends Controller
 	    		$mainTask->responsible_person = $request->responsible_person;
 
 	    		$mainTask->save();
-	    		return response()->json(['message' => 'Create main task successfully!'],200);
+
+	    		$log = new Log;
+                $log->action = 'User id '. $request->creator . ' create new main task'; 
+                $log->save();
+
+	    		return response()->json(['message' => 'Create main task successfully!','main-task' => $mainTask],200);
 	    	}
         }
 	}
@@ -120,7 +147,11 @@ class MainTaskController extends Controller
 		    		$mainTask->responsible_person = $request->responsible_person;
 
 		    		$mainTask->save();
-		    		return response()->json(['message' => 'Update main task successfully!'],200);
+
+		    		$log = new Log;
+                    $log->action = 'User id '. $request->user_id . ' update main task id-'.$id; 
+                    $log->save();
+		    		return response()->json(['message' => 'Update main task successfully!','main-task' => $mainTask],200);
 		    	}
 		    }
 		}
@@ -129,12 +160,16 @@ class MainTaskController extends Controller
 	}
 
 
-	public function delete($id){
+	public function delete(Request $request,$id){
 		$mainTask = MainTask::find($id);
 		if (!$mainTask) {
 			return response()->json(['message' => 'Main task  does not exist!']);
 		} else {
 			$mainTask->delete();
+
+			$log = new Log;
+            $log->action = 'User id '. $request->user_id . ' delete  main task id-'.$id; 
+            $log->save();
     		return response()->json(['message' => 'Delete main task successfully!'], 200);
 		}
 	}
@@ -172,5 +207,18 @@ class MainTaskController extends Controller
 		}
 	}
 
+
+	public function getUser($id){
+        $client = new Client(['base_uri' => 'https://dsd05-dot-my-test-project-252009.appspot.com',]);
+        try {
+            $response = $client->request('GET','/user/getUserInfo?id='.$id);
+            $body = $response->getBody();
+            return json_decode($body);
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            if($e->getResponse()->getStatusCode() != 200) {
+                return false;
+            }
+        }
+    }
 
 }

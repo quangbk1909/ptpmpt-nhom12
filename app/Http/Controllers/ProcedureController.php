@@ -7,6 +7,7 @@ use App\Procedure;
 use App\ProcedureType;
 use Illuminate\Http\Request;
 use Validator;
+use GuzzleHttp\Client;
 
 class ProcedureController extends Controller
 {
@@ -39,7 +40,12 @@ class ProcedureController extends Controller
     	$procedure = Procedure::find($id);
     	if ($procedure){
     		$procedureType = $procedure->procedureType;
-    		// Call api to get info user created procedure and handle
+            $user = $this->getUser($procedure->added_by);
+    		if($user){
+                $procedure->added_by = $user;
+            } else {
+                 $procedure->added_by = "User does not exist";
+            }
 
     		return response()->json ($procedure);
     	} else {
@@ -48,7 +54,7 @@ class ProcedureController extends Controller
     }
 
 
-    public function create(Request $request){
+    public function create(Request $request){        
     	$validator = Validator::make($request->all(), [
 				    		'title' => 'required|unique:procedures',
 				    	],
@@ -78,9 +84,9 @@ class ProcedureController extends Controller
                 $log->action = 'User id '. $request->added_by . ' create new procedure'; 
                 $log->save();
 
-        		return response()->json(['message' => 'Create procedure successfully!'], 201);
+        		return response()->json(['message' => 'Create procedure successfully!','procedure' => $procedure], 201);
         	}        	
-        }
+       }
     }
 
 
@@ -110,21 +116,46 @@ class ProcedureController extends Controller
 		    		$procedure->procedure_type_id = $request->procedure_type_id;
 		    		$procedure->content = $request->content;
 			    	$procedure->save();
-		    		return response()->json(['message' => 'Update procedure successfully!'], 200);
+
+                    $log = new Log;
+                    $log->action = 'User id '. $request->user_id . ' update  procedure id-'.$id; 
+                    $log->save();
+
+		    		return response()->json(['message' => 'Update procedure successfully!','procedure' => $procedure], 200);
 	    		}        	
 			}
 	    }
+
+
     }
 
 
-    public function delete($id){
+    public function delete(Request $request,$id){
     	$procedure = Procedure::find($id);
     	if (!$procedure) {
     		return response()->json(['message' => 'Procedure  does not exist!']);
     	} else {
     		$procedure->delete();
+
+            $log = new Log;
+            $log->action = 'User id '. $request->user_id . ' delete  procedure id-'.$id; 
+            $log->save();
+
     		return response()->json(['message' => 'Delete procedure successfully!'], 200);
     	}
+    }
+
+    public function getUser($id){
+        $client = new Client(['base_uri' => 'https://dsd05-dot-my-test-project-252009.appspot.com',]);
+        try {
+            $response = $client->request('GET','/user/getUserInfo?id='.$id);
+            $body = $response->getBody();
+            return json_decode($body);
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            if($e->getResponse()->getStatusCode() != 200) {
+                return false;
+            }
+        }
     }
 
     
