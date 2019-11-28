@@ -191,7 +191,7 @@ class ProcedureTaskController extends Controller
             $log->action = 'User id '. $request->user_id . ' update progress of  procedure task id-'.$id; 
             $log->save();
 
-	    	return response()->json(['message' => 'Update progress of task successfully!','task' => $procedureTask]]);
+	    	return response()->json(['message' => 'Update progress of task successfully!','task' => $procedureTask]);
     	}	
     }
 
@@ -211,7 +211,7 @@ class ProcedureTaskController extends Controller
                 $log->action = 'User id '. $request->user_id . ' mark done procedure task id-'.$id; 
                 $log->save();
 
-		    	return response()->json(['message' => 'Mark task been done  successfully!','task' => $procedureTask]]);
+		    	return response()->json(['message' => 'Mark task been done  successfully!','task' => $procedureTask]);
     		}
 
     		
