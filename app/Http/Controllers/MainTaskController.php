@@ -42,24 +42,20 @@ class MainTaskController extends Controller
     		if ($mainTask->creator != null) {
                 $creator = $this->getUser($mainTask->creator);
                 if ($creator){
-                    $mainTask->creator = $creator;
+                    $mainTask->creator_detail = $creator;
                 } else {
-                     $mainTask->creator = "User does not exist";
+                     $mainTask->creator_detail = "User does not exist";
                 }
-            } else {
-                $mainTask->creator = null;
             }
 
             if ($mainTask->responsible_person != null) {
                 $responsible_person = $this->getUser($mainTask->responsible_person);
                 if ($responsible_person){
-                    $mainTask->responsible_person = $responsible_person;
+                    $mainTask->responsible_person_detail = $responsible_person;
                 } else {
-                     $mainTask->responsible_person = "User does not exist";
+                     $mainTask->responsible_person_detail = "User does not exist";
                 }
-            } else {
-                $mainTask->responsible_person = null;
-            }
+            } 
 
 
     		return response()->json ($mainTask);

@@ -42,9 +42,9 @@ class ProcedureController extends Controller
     		$procedureType = $procedure->procedureType;
             $user = $this->getUser($procedure->added_by);
     		if($user){
-                $procedure->added_by = $user;
+                $procedure->added_by_detail = $user;
             } else {
-                 $procedure->added_by = "User does not exist";
+                 $procedure->added_by_detail = "User does not exist";
             }
 
     		return response()->json ($procedure);

@@ -47,24 +47,20 @@ class ProcedureTaskController extends Controller
             if ($task->creator != null) {
                 $creator = $this->getUser($task->creator);
                 if ($creator){
-                    $task->creator = $creator;
+                    $task->creator_detail = $creator;
                 } else {
-                     $task->creator = "User does not exist";
+                     $task->creator_detail = "User does not exist";
                 }
-            } else {
-                $task->creator = null;
-            }
+            } 
 
             if ($task->implementer != null) {
                 $implementer = $this->getUser($task->implementer);
                 if ($implementer){
-                    $task->implementer = $implementer;
+                    $task->implementer_detail = $implementer;
                 } else {
-                     $task->implementer = "User does not exist";
+                     $task->implementer_detail = "User does not exist";
                 }
-            } else {
-                $task->implementer = null;
-            }
+            } 
 
     		return response()->json ($task);
     	} else {
