@@ -9,6 +9,7 @@ use App\Procedure;
 use Validator;
 use GuzzleHttp\Client;
 use App\Log;
+use \Datetime;
 
 class MainTaskController extends Controller
 {
@@ -201,6 +202,34 @@ class MainTaskController extends Controller
 			}
 			
 		}
+	}
+
+	public function getTotal(){
+		$nunMainTask = MainTask::count();
+		return response()->json(['total' => $nunMainTask]);
+	}
+
+	public function analyze(){
+		$num_finished_task = MainTask::where('status','=',1)->count();
+		$main_tasks_unfinished = MainTask::where('status','=',0)->get();
+		$num_unfinished_task = 0;
+		$num_overdue_task = 0;
+		$date = new DateTime(date("Y-m-d H:i:s"));
+		foreach ($main_tasks_unfinished as $task) {
+			$deadline = new DateTime($task->deadline);
+			if ($date < $deadline) {
+				$num_unfinished_task += 1;
+			} else {
+				$num_overdue_task += 1;
+			}
+		}
+
+		return response()->json([
+									'num_finished_task' => $num_finished_task,
+									'num_unfinished_task' => $num_unfinished_task,
+									'num_overdue_task' => $num_overdue_task
+								]);
+
 	}
 
 

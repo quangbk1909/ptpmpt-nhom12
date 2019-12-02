@@ -88,6 +88,10 @@ Route::get('logs','LogController@getLogs');
 
 Route::get('test','LogController@testGuzz');
 
+Route::get('total-main-task  ', 'MainTaskController@getTotal');
+
+Route::get('analyze-main-task', 'MainTaskController@analyze');
+
 
 Route::group(['prefix'=>'configuration-management'], function() {
 
@@ -99,5 +103,5 @@ Route::group(['prefix'=>'configuration-management'], function() {
 
 
 
-
+    
 
