@@ -19,6 +19,34 @@ class MainTaskController extends Controller
 		foreach ($mainTask as $task) {
     		$procedure = $task->procedure;
     		unset($task['procedure_id']);
+
+    		if ($task->creator != null) {
+                $creator = $this->getUser($task->creator);
+                if ($creator){
+                    $task->creator_detail = $creator;
+                } else {
+                     $task->creator_detail = "User does not exist";
+                }
+            }
+
+            if ($task->responsible_person != null) {
+                $responsible_person = $this->getUser($task->responsible_person);
+                if ($responsible_person){
+                    $task->responsible_person_detail = $responsible_person;
+                } else {
+                     $task->responsible_person_detail = "User does not exist";
+                }
+            }
+
+            if ($task->department_id != null) {
+                $department = $this->getDepartment($task->department_id);
+                if ($department){
+                    $task->department_detail = $department;
+                } else {
+                     $task->department_detail = "Department does not exist";
+                }
+            }
+
     		array_push($tasks , $task);
     	}
 
@@ -56,8 +84,16 @@ class MainTaskController extends Controller
                 } else {
                      $mainTask->responsible_person_detail = "User does not exist";
                 }
-            } 
+            }
 
+            if ($mainTask->department_id != null) {
+                $department = $this->getDepartment($mainTask->department_id);
+                if ($department){
+                    $mainTask->department_detail = $department;
+                } else {
+                     $mainTask->department_detail = "Department does not exist";
+                }
+            }
 
     		return response()->json ($mainTask);
     	} else {
@@ -70,7 +106,32 @@ class MainTaskController extends Controller
 	public function getProcedureTasks($id){
 		$procedureTasks = ProcedureTask::where('main_task_id','=',$id)->orderBy('step', 'desc')->get();
 
-		return response()->json($procedureTasks, 200);
+		$tasks = array();
+        foreach ($procedureTasks as $task) {
+            $procedureStep =  $task->procedureStep;
+
+            if ($task->creator != null) {
+                $creator = $this->getUser($task->creator);
+                if ($creator){
+                    $task->creator_detail = $creator;
+                } else {
+                     $task->creator_detail = "User does not exist";
+                }
+            } 
+
+            if ($task->implementer != null) {
+                $implementer = $this->getUser($task->implementer);
+                if ($implementer){
+                    $task->implementer_detail = $implementer;
+                } else {
+                     $task->implementer_detail = "User does not exist";
+                }
+            }
+            unset($task['main_task_id']);
+            array_push($tasks , $task);
+        }
+
+        return response()->json($tasks);
 	}
 
 
@@ -245,5 +306,19 @@ class MainTaskController extends Controller
             }
         }
     }
+
+    public function getDepartment($id){
+        $client = new Client(['base_uri' => 'https://dsd15-department.azurewebsites.net',]);
+        try {
+            $response = $client->request('GET','/Departments/'.$id);
+            $body = $response->getBody();
+            return json_decode($body);
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            if($e->getResponse()->getStatusCode() != 200) {
+                return false;
+            }
+        }
+    }
+
 
 }

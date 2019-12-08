@@ -18,7 +18,17 @@ class ProcedureController extends Controller
     	foreach ($allProcedures as $procedure) {
     		$procedureType = $procedure->procedureType;
     		unset($procedure['procedure_type_id']);
+            $procedureSteps = $procedure->procedureSteps;
+            $user = $this->getUser($procedure->added_by);
+            if($user){
+                $procedure->added_by_detail = $user;
+            } else {
+                 $procedure->added_by_detail = "User does not exist";
+            }
+            
     		array_push($procedureList , $procedure);
+
+
     	}
 
     	return response()->json($procedureList, 200);

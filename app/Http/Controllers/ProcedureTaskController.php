@@ -44,6 +44,7 @@ class ProcedureTaskController extends Controller
     	if ($task){
     		$mainTask = $task->mainTask;
     		$procedure = $mainTask->procedure;
+            $procedureStep =  $task->procedureStep;
     		$procedureType = $procedure->procedureType;
             $procedureStep = $task->procedureStep;
             if ($task->creator != null) {
@@ -63,6 +64,8 @@ class ProcedureTaskController extends Controller
                      $task->implementer_detail = "User does not exist";
                 }
             } 
+
+
 
     		return response()->json ($task);
     	} else {
@@ -239,7 +242,34 @@ class ProcedureTaskController extends Controller
         $data = array();
 
         if(!$ids){
-            $tasks = ProcedureTask::all();
+            $procedureTasks = ProcedureTask::all();
+
+            $tasks = array();
+            foreach ($procedureTasks as $task) {
+                $mainTask = $task->mainTask;
+                $procedureStep =  $task->procedureStep;
+
+                if ($task->creator != null) {
+                    $creator = $this->getUser($task->creator);
+                    if ($creator){
+                        $task->creator_detail = $creator;
+                    } else {
+                         $task->creator_detail = "User does not exist";
+                    }
+                } 
+
+                if ($task->implementer != null) {
+                    $implementer = $this->getUser($task->implementer);
+                    if ($implementer){
+                        $task->implementer_detail = $implementer;
+                    } else {
+                         $task->implementer_detail = "User does not exist";
+                    }
+                }
+                unset($task['main_task_id']);
+                array_push($tasks , $task);
+            }
+
             return response()->json($tasks);
         } else {
             foreach ($ids as $id) {
@@ -249,6 +279,26 @@ class ProcedureTaskController extends Controller
                                         'data' => 'There is no task corresponding to id!');
                     array_push($data, $task_info);
                 } else {
+                    $procedureStep =  $task->procedureStep;
+
+                    if ($task->creator != null) {
+                        $creator = $this->getUser($task->creator);
+                        if ($creator){
+                            $task->creator_detail = $creator;
+                        } else {
+                             $task->creator_detail = "User does not exist";
+                        }
+                    } 
+
+                    if ($task->implementer != null) {
+                        $implementer = $this->getUser($task->implementer);
+                        if ($implementer){
+                            $task->implementer_detail = $implementer;
+                        } else {
+                             $task->implementer_detail = "User does not exist";
+                        }
+                    }
+
                     $task_info = array('id' => $id,
                                         'data' => $task);
                     array_push($data, $task_info);
