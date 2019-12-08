@@ -13,6 +13,12 @@ use \Datetime;
 
 class MainTaskController extends Controller
 {
+
+	public function getMainTaskList(){
+		$mainTasks = MainTask::all();
+		return response()->json($mainTasks);
+	}
+
     public function show(){
 		$mainTask = MainTask::orderBy('created_at', 'desc')->get();
 		$tasks = array();
@@ -59,6 +65,16 @@ class MainTaskController extends Controller
 			return response()->json (['message' => 'Procedure does not exist!']);
 		} else {
 			return response()->json ($procedure->mainTasks);
+		}
+	}
+
+
+	public function getProcedureTasksList($id){
+		$mainTask = MainTask::find($id);
+		if($mainTask) {
+			return response()->json($mainTask->procedureTasks);
+		} else {
+			return response()->json (['message' => 'Main task does not exist!']); 
 		}
 	}
 

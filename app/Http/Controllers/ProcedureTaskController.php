@@ -25,6 +25,20 @@ class ProcedureTaskController extends Controller
 		return response()->json($tasks, 200);
 	}
 
+    public function getDetailProcedure($id){
+        $procedureTask = ProcedureTask::find($id);
+        if($procedureTask){
+            $mainTask = $procedureTask->mainTask;
+            $procedureStep =  $procedureTask->procedureStep;
+
+            return response()->json($procedureTask);
+        } else {
+            return response()->json (['message' => 'Task does not exist!']);
+        }
+
+
+    }
+
 
 	public function getTasksImplemented($userID){
 		$procedureTasks = ProcedureTask::where('implementer','=',$userID)->orderBy('created_at', 'desc')->get();
@@ -44,9 +58,8 @@ class ProcedureTaskController extends Controller
     	if ($task){
     		$mainTask = $task->mainTask;
     		$procedure = $mainTask->procedure;
-            $procedureStep =  $task->procedureStep;
-    		$procedureType = $procedure->procedureType;
             $procedureStep = $task->procedureStep;
+    		$procedureType = $procedure->procedureType;
             if ($task->creator != null) {
                 $creator = $this->getUser($task->creator);
                 if ($creator){
@@ -245,28 +258,8 @@ class ProcedureTaskController extends Controller
             $procedureTasks = ProcedureTask::all();
 
             $tasks = array();
-            foreach ($procedureTasks as $task) {
-                $mainTask = $task->mainTask;
+            foreach ($procedureTasks as $task) { 
                 $procedureStep =  $task->procedureStep;
-
-                if ($task->creator != null) {
-                    $creator = $this->getUser($task->creator);
-                    if ($creator){
-                        $task->creator_detail = $creator;
-                    } else {
-                         $task->creator_detail = "User does not exist";
-                    }
-                } 
-
-                if ($task->implementer != null) {
-                    $implementer = $this->getUser($task->implementer);
-                    if ($implementer){
-                        $task->implementer_detail = $implementer;
-                    } else {
-                         $task->implementer_detail = "User does not exist";
-                    }
-                }
-                unset($task['main_task_id']);
                 array_push($tasks , $task);
             }
 
@@ -281,24 +274,6 @@ class ProcedureTaskController extends Controller
                 } else {
                     $procedureStep =  $task->procedureStep;
 
-                    if ($task->creator != null) {
-                        $creator = $this->getUser($task->creator);
-                        if ($creator){
-                            $task->creator_detail = $creator;
-                        } else {
-                             $task->creator_detail = "User does not exist";
-                        }
-                    } 
-
-                    if ($task->implementer != null) {
-                        $implementer = $this->getUser($task->implementer);
-                        if ($implementer){
-                            $task->implementer_detail = $implementer;
-                        } else {
-                             $task->implementer_detail = "User does not exist";
-                        }
-                    }
-
                     $task_info = array('id' => $id,
                                         'data' => $task);
                     array_push($data, $task_info);
@@ -307,6 +282,12 @@ class ProcedureTaskController extends Controller
             return response()->json($data);
         }
         
+    }
+
+
+    public function getListTask(){
+        $procedureTask = ProcedureTask::all();
+        return response()->json($procedureTask);
     }
 
 

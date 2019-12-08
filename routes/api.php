@@ -95,6 +95,14 @@ Route::get('analyze-main-task', 'MainTaskController@analyze');
 Route::get('analyze-procedure-task', 'ProcedureTaskController@analyze');
 
 
+Route::get('procedure-task-list' ,'ProcedureTaskController@getListTask');
+
+Route::get('main-task-list','MainTaskController@getMainTaskList');
+
+Route::get('procedure-task-detail/{id}','ProcedureTaskController@getDetailProcedure');
+
+Route::get('proceduretask-of-maintask/{id}','MainTaskController@getProcedureTasksList');
+
 Route::group(['prefix'=>'configuration-management'], function() {
 
     Route::get('task-field', 'ConfigurationManagementController@getFieldsOfTask');
