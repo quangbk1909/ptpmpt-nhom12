@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 28, 2019 lúc 04:58 PM
+-- Thời gian đã tạo: Th12 06, 2019 lúc 05:35 PM
 -- Phiên bản máy phục vụ: 5.7.19
 -- Phiên bản PHP: 7.2.6
 
@@ -64,7 +64,8 @@ INSERT INTO `logs` (`id`, `action`, `created_at`, `updated_at`) VALUES
 (22, 'User id 2 update main task id-14', '2019-11-28 07:12:02', '2019-11-28 07:12:02'),
 (23, 'User id 2 update main task id-14', '2019-11-28 07:12:07', '2019-11-28 07:12:07'),
 (24, 'User id 2 delete  main task id-14', '2019-11-28 07:12:42', '2019-11-28 07:12:42'),
-(25, 'User id 2 delete  main task id-13', '2019-11-28 07:12:46', '2019-11-28 07:12:46');
+(25, 'User id 2 delete  main task id-13', '2019-11-28 07:12:46', '2019-11-28 07:12:46'),
+(26, 'User id  update progress of  procedure task id-1', '2019-11-29 03:33:22', '2019-11-29 03:33:22');
 
 -- --------------------------------------------------------
 
@@ -91,17 +92,17 @@ CREATE TABLE `main_tasks` (
 --
 
 INSERT INTO `main_tasks` (`id`, `name`, `description`, `deadline`, `status`, `finished_at`, `procedure_id`, `creator`, `responsible_person`, `created_at`, `updated_at`) VALUES
-(1, 'Xuất kho lô thuốc 1', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-11-29 17:00:00', 0, NULL, 1, 1, 4, '2019-11-11 14:28:05', '2019-11-11 14:28:05'),
-(2, 'Kiểm kê kho Hà Nội 1', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-11-15 17:00:00', 0, NULL, 2, 2, 5, '2019-11-14 03:14:08', '2019-11-14 03:14:08'),
-(3, 'Quy trình sản xuất men tiêu hóa tự nhiên', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-11-29 17:00:00', 0, NULL, 3, 1, 6, '2019-11-14 03:15:28', '2019-11-14 03:15:28'),
-(4, 'Hoàn thiện kiểm tra dầu gội thảo dược ', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-12-14 17:00:00', 0, NULL, 4, 2, 7, '2019-11-14 03:18:16', '2019-11-14 03:18:16'),
-(5, 'Bán lẻ tại cửa hàng đại diện', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-11-29 17:00:00', 0, NULL, 5, 3, 8, '2019-11-14 03:20:13', '2019-11-14 03:20:13'),
-(6, 'Bán theo lô tới các bệnh viện lớn tại Hà Nội', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-12-14 17:00:00', 0, NULL, 6, 1, 9, '2019-11-14 03:21:24', '2019-11-14 03:21:24'),
-(7, 'Quảng cáo sản phẩm thuốc canxi cho người già', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-11-29 17:00:00', 0, NULL, 7, 2, 10, '2019-11-14 03:22:50', '2019-11-14 03:22:50'),
-(8, 'Kiểm kê kho Hà Nội 2', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-12-14 17:00:00', 0, NULL, 2, 3, 11, '2019-11-14 03:28:04', '2019-11-14 03:28:04'),
-(9, 'Kiểm kê kho Hà Nội 3', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-12-29 17:00:00', 0, NULL, 2, 1, 12, '2019-11-14 03:28:23', '2019-11-14 03:28:23'),
-(10, 'Nhập lô thuốc số 2', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-12-04 17:00:00', 0, NULL, 1, 2, 13, '2019-11-14 03:31:56', '2019-11-14 03:31:56'),
-(11, 'Xuất lô thuốc 2', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-12-29 17:00:00', 0, NULL, 1, 3, 14, '2019-11-14 03:32:24', '2019-11-14 03:32:24');
+(1, 'Xuất kho lô thuốc 1', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-11-29 17:00:00', 0, NULL, 1, 4701649964630016, 5144140178259968, '2019-11-11 14:28:05', '2019-11-11 14:28:05'),
+(2, 'Kiểm kê kho Hà Nội 1', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-11-15 17:00:00', 1, '2019-11-14 17:00:00', 2, 4913439768051712, 5181555517423616, '2019-11-14 03:14:08', '2019-11-14 03:14:08'),
+(3, 'Quy trình sản xuất men tiêu hóa tự nhiên', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-11-29 17:00:00', 1, '2019-11-28 17:00:00', 3, 4701649964630016, 5212786808324096, '2019-11-14 03:15:28', '2019-11-14 03:15:28'),
+(4, 'Hoàn thiện kiểm tra dầu gội thảo dược ', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-12-14 17:00:00', 0, NULL, 4, 4913439768051712, 5144140178259968, '2019-11-14 03:18:16', '2019-11-14 03:18:16'),
+(5, 'Bán lẻ tại cửa hàng đại diện', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-11-29 17:00:00', 1, '2019-11-28 17:00:00', 5, 4701649964630016, 5181555517423616, '2019-11-14 03:20:13', '2019-11-14 03:20:13'),
+(6, 'Bán theo lô tới các bệnh viện lớn tại Hà Nội', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-12-14 17:00:00', 0, NULL, 6, 4913439768051712, 5212786808324096, '2019-11-14 03:21:24', '2019-11-14 03:21:24'),
+(7, 'Quảng cáo sản phẩm thuốc canxi cho người già', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-11-29 17:00:00', 1, '2019-10-28 17:00:00', 7, 4701649964630016, 5144140178259968, '2019-11-14 03:22:50', '2019-11-14 03:22:50'),
+(8, 'Kiểm kê kho Hà Nội 2', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-12-14 17:00:00', 0, NULL, 2, 4913439768051712, 5181555517423616, '2019-11-14 03:28:04', '2019-11-14 03:28:04'),
+(9, 'Kiểm kê kho Hà Nội 3', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-12-29 17:00:00', 0, NULL, 2, 4701649964630016, 5212786808324096, '2019-11-14 03:28:23', '2019-11-14 03:28:23'),
+(10, 'Nhập lô thuốc số 2', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-12-04 17:00:00', 0, NULL, 1, 4913439768051712, 5144140178259968, '2019-11-14 03:31:56', '2019-11-14 03:31:56'),
+(11, 'Xuất lô thuốc 2', 'orem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rhoncus ex id sollicitudin iaculis. Nullam accumsan ornare augue, eu viverra metus suscipit at. Curabitur consequat magna justo, quis mollis lorem vehicula id.', '2019-12-29 17:00:00', 0, NULL, 1, 4701649964630016, 5181555517423616, '2019-11-14 03:32:24', '2019-11-14 03:32:24');
 
 -- --------------------------------------------------------
 
@@ -161,6 +162,28 @@ INSERT INTO `procedures` (`id`, `title`, `procedure_type_id`, `content`, `added_
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `procedure_steps`
+--
+
+CREATE TABLE `procedure_steps` (
+  `id` bigint(20) NOT NULL,
+  `step` int(11) NOT NULL,
+  `content` text NOT NULL,
+  `procedure_id` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Đang đổ dữ liệu cho bảng `procedure_steps`
+--
+
+INSERT INTO `procedure_steps` (`id`, `step`, `content`, `procedure_id`) VALUES
+(1, 1, 'step1', 1),
+(2, 2, 'step 2', 1),
+(3, 3, 'step 3', 1);
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `procedure_tasks`
 --
 
@@ -176,6 +199,7 @@ CREATE TABLE `procedure_tasks` (
   `main_task_id` bigint(20) UNSIGNED NOT NULL,
   `creator` bigint(20) NOT NULL,
   `implementer` bigint(20) DEFAULT NULL,
+  `procedure_step_id` bigint(20) NOT NULL,
   `step` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -185,10 +209,10 @@ CREATE TABLE `procedure_tasks` (
 -- Đang đổ dữ liệu cho bảng `procedure_tasks`
 --
 
-INSERT INTO `procedure_tasks` (`id`, `name`, `content`, `deadline`, `status`, `finished_at`, `amount_of_work`, `amount_of_accomplished_work`, `main_task_id`, `creator`, `implementer`, `step`, `created_at`, `updated_at`) VALUES
-(1, 'Xuất kho lô thuốc 1 task 1', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.', '2019-11-04 17:00:00', 1, NULL, 40, 40, 1, 5144140178259968, NULL, 1, '2019-11-05 02:35:42', '2019-11-06 06:48:35'),
-(2, 'Xuất kho lô thuốc 1 task 2', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.', '2019-11-14 17:00:00', 0, NULL, 30, 50, 1, 5144140178259968, 5144140178259968, 2, '2019-11-13 17:00:00', '2019-11-14 11:07:50'),
-(3, 'Xuât kho lô thuốc 1 task 3', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.', '2019-11-19 17:00:00', 0, NULL, 10, 40, 1, 5144140178259968, 5144140178259968, 3, '2019-11-14 03:39:42', '2019-11-14 11:07:50');
+INSERT INTO `procedure_tasks` (`id`, `name`, `content`, `deadline`, `status`, `finished_at`, `amount_of_work`, `amount_of_accomplished_work`, `main_task_id`, `creator`, `implementer`, `procedure_step_id`, `step`, `created_at`, `updated_at`) VALUES
+(1, 'Xuất kho lô thuốc 1 task 1', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.', '2019-11-04 17:00:00', 1, NULL, 40, 10, 1, 5144140178259968, 5632908932939776, 1, 1, '2019-11-05 02:35:42', '2019-11-29 03:33:22'),
+(2, 'Xuất kho lô thuốc 1 task 2', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.', '2019-11-14 17:00:00', 0, NULL, 30, 50, 1, 5144140178259968, 1575590400000, 2, 2, '2019-11-13 17:00:00', '2019-11-14 11:07:50'),
+(3, 'Xuât kho lô thuốc 1 task 3', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.', '2019-11-19 17:00:00', 0, NULL, 10, 40, 1, 5144140178259968, 1575590400000, 3, 3, '2019-11-14 03:39:42', '2019-11-14 11:07:50');
 
 -- --------------------------------------------------------
 
@@ -277,11 +301,19 @@ ALTER TABLE `procedures`
   ADD KEY `procedure_type` (`procedure_type_id`);
 
 --
+-- Chỉ mục cho bảng `procedure_steps`
+--
+ALTER TABLE `procedure_steps`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_procedure_proceduresteps` (`procedure_id`);
+
+--
 -- Chỉ mục cho bảng `procedure_tasks`
 --
 ALTER TABLE `procedure_tasks`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_main_task` (`main_task_id`);
+  ADD KEY `fk_main_task` (`main_task_id`),
+  ADD KEY `fk_procedure_step` (`procedure_step_id`);
 
 --
 -- Chỉ mục cho bảng `procedure_types`
@@ -310,13 +342,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT cho bảng `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT cho bảng `main_tasks`
 --
 ALTER TABLE `main_tasks`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT cho bảng `migrations`
@@ -328,7 +360,13 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT cho bảng `procedures`
 --
 ALTER TABLE `procedures`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT cho bảng `procedure_steps`
+--
+ALTER TABLE `procedure_steps`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT cho bảng `procedure_tasks`
@@ -371,10 +409,17 @@ ALTER TABLE `procedures`
   ADD CONSTRAINT `procedure_type` FOREIGN KEY (`procedure_type_id`) REFERENCES `procedure_types` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Các ràng buộc cho bảng `procedure_steps`
+--
+ALTER TABLE `procedure_steps`
+  ADD CONSTRAINT `fk_procedure_proceduresteps` FOREIGN KEY (`procedure_id`) REFERENCES `procedures` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Các ràng buộc cho bảng `procedure_tasks`
 --
 ALTER TABLE `procedure_tasks`
-  ADD CONSTRAINT `fk_main_task` FOREIGN KEY (`main_task_id`) REFERENCES `main_tasks` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_main_task` FOREIGN KEY (`main_task_id`) REFERENCES `main_tasks` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_procedure_step` FOREIGN KEY (`procedure_step_id`) REFERENCES `procedure_steps` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

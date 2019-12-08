@@ -15,4 +15,8 @@ class Procedure extends Model
     public function mainTasks(){
     	return $this->hasMany('App\MainTask','procedure_id', 'id');
     }
+
+    public function procedureSteps(){
+    	return $this->hasMany('App\ProcedureStep','procedure_id','id');
+    }
 }

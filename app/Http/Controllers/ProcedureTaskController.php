@@ -8,6 +8,7 @@ use App\MainTask;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Log;
+use \Datetime;
 
 
 class ProcedureTaskController extends Controller
@@ -44,6 +45,7 @@ class ProcedureTaskController extends Controller
     		$mainTask = $task->mainTask;
     		$procedure = $mainTask->procedure;
     		$procedureType = $procedure->procedureType;
+            $procedureStep = $task->procedureStep;
             if ($task->creator != null) {
                 $creator = $this->getUser($task->creator);
                 if ($creator){
@@ -237,7 +239,8 @@ class ProcedureTaskController extends Controller
         $data = array();
 
         if(!$ids){
-            return response()->json(['message' => 'No id or list id to get procedure task']);
+            $tasks = ProcedureTask::all();
+            return response()->json($tasks);
         } else {
             foreach ($ids as $id) {
                 $task = ProcedureTask::find($id);
@@ -255,6 +258,31 @@ class ProcedureTaskController extends Controller
         }
         
     }
+
+
+    public function analyze(){
+        $num_finished_task = ProcedureTask::where('status','=',1)->count();
+        $procedure_tasks_unfinished = ProcedureTask::where('status','=',0)->get();
+        $num_unfinished_task = 0;
+        $num_overdue_task = 0;
+        $date = new DateTime(date("Y-m-d H:i:s"));
+        foreach ($procedure_tasks_unfinished as $task) {
+            $deadline = new DateTime($task->deadline);
+            if ($date < $deadline) {
+                $num_unfinished_task += 1;
+            } else {
+                $num_overdue_task += 1;
+            }
+        }
+
+        return response()->json([
+                                    'num_finished_task' => $num_finished_task,
+                                    'num_unfinished_task' => $num_unfinished_task,
+                                    'num_overdue_task' => $num_overdue_task
+                                ]);
+
+    }
+
 
     public function getUser($id){
         $client = new Client(['base_uri' => 'https://dsd05-dot-my-test-project-252009.appspot.com',]);

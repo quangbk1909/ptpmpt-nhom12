@@ -40,6 +40,7 @@ class ProcedureController extends Controller
     	$procedure = Procedure::find($id);
     	if ($procedure){
     		$procedureType = $procedure->procedureType;
+            $procedureSteps = $procedure->procedureSteps;
             $user = $this->getUser($procedure->added_by);
     		if($user){
                 $procedure->added_by_detail = $user;
