@@ -254,7 +254,7 @@ class ProcedureTaskController extends Controller
         $ids = $request->id;
         $data = array();
 
-        if(!$ids){
+        if(!$ids && !$request->start_from && !$request->start_to && !$request->finish_from && !$request->finish_to ){
             $procedureTasks = ProcedureTask::all();
 
             $tasks = array();
@@ -264,7 +264,9 @@ class ProcedureTaskController extends Controller
             }
 
             return response()->json($tasks);
-        } else {
+        } 
+
+        if ($ids){
             foreach ($ids as $id) {
                 $task = ProcedureTask::find($id);
                 if(!$task){
@@ -280,6 +282,53 @@ class ProcedureTaskController extends Controller
                 }
             }
             return response()->json($data);
+        }
+
+        if ($request->start_from && $request->start_to) {
+            $start_from =  new DateTime(date("Y-m-d H:i:s",(int)$request->start_from));
+            $start_to =  new DateTime(date("Y-m-d H:i:s",(int)$request->start_to));
+
+            $procedureTasks = ProcedureTask::all();
+
+            $tasks = array();
+            foreach ($procedureTasks as $task) { 
+                if ($task->started_at) {
+                    $startTime = new DateTime($task->started_at);
+                    if ($startTime >= $start_from && $startTime <= $start_to) {
+                        $procedureStep =  $task->procedureStep;
+                        array_push($tasks , $task);
+                    }
+                }
+                
+            }
+
+            return response()->json($tasks);
+
+        } else if (($request->start_from && !$request->start_to) || (!$request->start_from && $request->start_to)){
+            return response()->json(['message' => 'Require both start_from and start_to to filter']);
+        }
+
+        if ($request->finish_from && $request->finish_to) {
+            $finish_from =  new DateTime(date("Y-m-d H:i:s",(int)$request->finish_from));
+            $finish_to =  new DateTime(date("Y-m-d H:i:s",(int)$request->finish_to));
+
+            $procedureTasks = ProcedureTask::all();
+
+            $tasks = array();
+            foreach ($procedureTasks as $task) { 
+                if ($task->finished_at) {
+                    $finishTime = new DateTime($task->finished_at);
+                    if ($finishTime >= $finish_from && $finishTime <= $finish_to) {
+                        $procedureStep =  $task->procedureStep;
+                        array_push($tasks , $task);
+                    }
+                } 
+            }
+
+            return response()->json($tasks);
+
+        } else if (($request->finish_from && !$request->finish_to) || (!$request->finish_from && $request->finish_to)){
+            return response()->json(['message' => 'Require both finish_from and finish_to to filter']);
         }
         
     }
