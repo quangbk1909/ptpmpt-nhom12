@@ -286,8 +286,52 @@ class ProcedureTaskController extends Controller
 
 
     public function getListTask(){
-        $procedureTask = ProcedureTask::all();
-        return response()->json($procedureTask);
+        $procedureTasks = ProcedureTask::all();
+
+        $tasks = array();
+
+        $users = $this->getAllUser();
+
+        foreach ($procedureTasks as $task) {
+            
+            $mainTask = $task->mainTask;
+            $procedure = $mainTask->procedure;
+            $procedureStep = $task->procedureStep;
+            $procedureType = $procedure->procedureType;
+            if ($task->creator != null) {
+                //$creator = null;
+                // $creator = $this->getUser($task->creator);
+                foreach ($users as $user) {
+                    if ($user->id = $task->creator) {
+                        $creator = $user;
+                    }
+                }
+                if ($creator){
+                    $task->creator_detail = $creator;
+                } else {
+                     $task->creator_detail = "User does not exist";
+                }
+            } 
+
+            if ($task->implementer != null) {
+                //$implementer = $this->getUser($task->implementer);
+                foreach ($users as $user) {
+                    if ($user->id = $task->implementer) {
+                        $implementer = $user;
+                    }
+                }
+
+                if ($implementer){
+                    $task->implementer_detail = $implementer;
+                } else {
+                     $task->implementer_detail = "User does not exist";
+                }
+            }
+
+            array_push($tasks, $task);
+        }
+
+        return response()->json($tasks);
     }
 
 
@@ -327,4 +371,18 @@ class ProcedureTaskController extends Controller
             }
         }
     }
+
+    public function getAllUser(){
+        $client = new Client(['base_uri' => 'https://dsd05-dot-my-test-project-252009.appspot.com',]);
+        try {
+            $response = $client->request('GET','/user/getUserInfos');
+            $body = $response->getBody();
+            return json_decode($body);
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            if($e->getResponse()->getStatusCode() != 200) {
+                return false;
+            }
+        }
+    }
+
 }

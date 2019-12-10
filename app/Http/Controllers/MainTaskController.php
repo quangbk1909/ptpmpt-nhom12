@@ -22,12 +22,20 @@ class MainTaskController extends Controller
     public function show(){
 		$mainTask = MainTask::orderBy('created_at', 'desc')->get();
 		$tasks = array();
+		$departments = $this->getAllDepartment();
+		$users = $this->getAllUser();
+
 		foreach ($mainTask as $task) {
     		$procedure = $task->procedure;
     		unset($task['procedure_id']);
 
+
     		if ($task->creator != null) {
-                $creator = $this->getUser($task->creator);
+                foreach ($users as $user) {
+                    if ($user->id = $task->creator) {
+                        $creator = $user;
+                    }
+                }
                 if ($creator){
                     $task->creator_detail = $creator;
                 } else {
@@ -36,7 +44,12 @@ class MainTaskController extends Controller
             }
 
             if ($task->responsible_person != null) {
-                $responsible_person = $this->getUser($task->responsible_person);
+                foreach ($users as $user) {
+                    if ($user->id = $task->responsible_person) {
+                        $responsible_person = $user;
+                    }
+                }
+
                 if ($responsible_person){
                     $task->responsible_person_detail = $responsible_person;
                 } else {
@@ -45,9 +58,15 @@ class MainTaskController extends Controller
             }
 
             if ($task->department_id != null) {
-                $department = $this->getDepartment($task->department_id);
-                if ($department){
-                    $task->department_detail = $department;
+                $depart = null;
+                foreach ($departments as $department) {
+                    if ($department->id = $task->department_id) {
+                        $depart = $department;
+                    }
+                }
+
+                if ($depart){
+                    $task->department_detail = $depart;
                 } else {
                      $task->department_detail = "Department does not exist";
                 }
@@ -123,11 +142,18 @@ class MainTaskController extends Controller
 		$procedureTasks = ProcedureTask::where('main_task_id','=',$id)->orderBy('step', 'desc')->get();
 
 		$tasks = array();
+		$users = $this->getAllUser();
         foreach ($procedureTasks as $task) {
             $procedureStep =  $task->procedureStep;
 
             if ($task->creator != null) {
-                $creator = $this->getUser($task->creator);
+                //$creator = null;
+                // $creator = $this->getUser($task->creator);
+                foreach ($users as $user) {
+                    if ($user->id = $task->creator) {
+                        $creator = $user;
+                    }
+                }
                 if ($creator){
                     $task->creator_detail = $creator;
                 } else {
@@ -136,14 +162,20 @@ class MainTaskController extends Controller
             } 
 
             if ($task->implementer != null) {
-                $implementer = $this->getUser($task->implementer);
+                //$implementer = $this->getUser($task->implementer);
+                foreach ($users as $user) {
+                    if ($user->id = $task->implementer) {
+                        $implementer = $user;
+                    }
+                }
+
                 if ($implementer){
                     $task->implementer_detail = $implementer;
                 } else {
                      $task->implementer_detail = "User does not exist";
                 }
             }
-            unset($task['main_task_id']);
+
             array_push($tasks , $task);
         }
 
@@ -327,6 +359,32 @@ class MainTaskController extends Controller
         $client = new Client(['base_uri' => 'https://dsd15-department.azurewebsites.net',]);
         try {
             $response = $client->request('GET','/Departments/'.$id);
+            $body = $response->getBody();
+            return json_decode($body);
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            if($e->getResponse()->getStatusCode() != 200) {
+                return false;
+            }
+        }
+    }
+
+    public function getAllDepartment(){
+        $client = new Client(['base_uri' => 'https://dsd15-department.azurewebsites.net',]);
+        try {
+            $response = $client->request('GET','/Departments/');
+            $body = $response->getBody();
+            return json_decode($body);
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            if($e->getResponse()->getStatusCode() != 200) {
+                return false;
+            }
+        }
+    }
+
+    public function getAllUser(){
+        $client = new Client(['base_uri' => 'https://dsd05-dot-my-test-project-252009.appspot.com',]);
+        try {
+            $response = $client->request('GET','/user/getUserInfos');
             $body = $response->getBody();
             return json_decode($body);
         } catch (\GuzzleHttp\Exception\BadResponseException $e) {

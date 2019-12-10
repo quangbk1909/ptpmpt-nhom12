@@ -15,17 +15,25 @@ class ProcedureController extends Controller
     	$allProcedures = Procedure::all();
     	$procedureList = array();
 
+        $users = $this->getAllUser();
+
     	foreach ($allProcedures as $procedure) {
     		$procedureType = $procedure->procedureType;
     		unset($procedure['procedure_type_id']);
             $procedureSteps = $procedure->procedureSteps;
-            $user = $this->getUser($procedure->added_by);
+
+            foreach ($users as $user) {
+                    if ($user->id = $procedure->added_by) {
+                        $creator = $user;
+                    }
+                }
+
             if($user){
-                $procedure->added_by_detail = $user;
+                $procedure->added_by_detail = $creator;
             } else {
                  $procedure->added_by_detail = "User does not exist";
             }
-            
+
     		array_push($procedureList , $procedure);
 
 
@@ -169,5 +177,54 @@ class ProcedureController extends Controller
         }
     }
 
+
+    public function getAllUser(){
+        $client = new Client(['base_uri' => 'https://dsd05-dot-my-test-project-252009.appspot.com',]);
+        try {
+            $response = $client->request('GET','/user/getUserInfos');
+            $body = $response->getBody();
+            return json_decode($body);
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            if($e->getResponse()->getStatusCode() != 200) {
+                return false;
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+    // for view render
+
+
+    public function getAllProceduresView(){
+        $procedures = Procedure::all();
+
+        $users = $this->getAllUser();
+
+        foreach ($procedures as $procedure) {
+            foreach ($users as $user) {
+                    if ($user->id = $procedure->added_by) {
+                        $creator = $user;
+                    }
+                }
+
+            if($user){
+                $procedure->adder = $creator;
+            } else {
+                 $procedure->adder = "User does not exist";
+            }
+
+        }
+
+        return view('procedure.show',compact('procedures'));
+
+
+    }
     
 }
