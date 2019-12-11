@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Log;
 use \Datetime;
+use App\ProcedureStep;
 
 
 class ProcedureTaskController extends Controller
@@ -53,7 +54,7 @@ class ProcedureTaskController extends Controller
 	}
 
 
-	public function showDetail($id){
+	public function showDetail(Request $request,$id){
 		$task = ProcedureTask::find($id);
     	if ($task){
     		$mainTask = $task->mainTask;
@@ -79,9 +80,21 @@ class ProcedureTaskController extends Controller
             } 
 
 
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->object_id = (int)$id;
+            $log->response_code = 200;
+            $log->save();
 
     		return response()->json ($task);
     	} else {
+
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->object_id = (int)$id;
+            $log->response_code = 400;
+            $log->save();
+
     		return response()->json (['message' => 'Task does not exist!']);
     	}
 	}
@@ -89,9 +102,14 @@ class ProcedureTaskController extends Controller
 
     public function create(Request $request){
     	$mainTask = MainTask::find($request->main_task_id);
-        $lastStep = ProcedureTask::where('main_task_id','=',$request->main_task_id)->orderBy('step', 'desc')->first();
     	// call api check user exist with id creator
     	if(!$mainTask) {
+
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->response_code = 400;
+            $log->save();
+
     		return response()->json(['message' => 'Main task  does not exist!']);
     	} else if(0){
     		return response()->json(['message' => 'The user who created this task  does not exist!']);
@@ -102,16 +120,16 @@ class ProcedureTaskController extends Controller
     		$procedureTask->amount_of_work = $request->amount_of_work;
     		$procedureTask->main_task_id = $request->main_task_id;
     		$procedureTask->creator = $request->creator;
+            $procedureTask->procedure_step_id = $request->procedure_step_id;
+            $procedureStep = ProcedureStep::find($request->procedure_step_id);
+            $procedureTask->step = $procedureStep->step;
 
-            if (!$lastStep) {
-                $procedureTask->step = 1;
-            } else {
-                $procedureTask->step = $lastStep->step + 1;
-            }
     		$procedureTask->save();
 
-            $log = new Log;
-            $log->action = 'User id '. $request->user_id . ' create new procedure task '; 
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->object_id = $procedureTask->id;
+            $log->response_code = 200;
             $log->save();
 
     		return response()->json(['message' => 'Create task successfully!','task' => $procedureTask],200);
@@ -121,49 +139,51 @@ class ProcedureTaskController extends Controller
 
     public function update(Request $request, $id){
         $procedureTask = ProcedureTask::find($id);
-    	$mainTask = MainTask::find($procedureTask->main_task_id);
-    	// call api check user exist with id creator
-    	if(!$mainTask) {
-    		return response()->json(['message' => 'Main task  does not exist!']);
-    	} else if(0){
-    		return response()->json(['message' => 'The user who created this task  does not exist!']);
-    	} else {
-            if(!$procedureTask) {
-                return response()->json(['message' => 'Procedure task  does not exist!']);
-            } else {
-                $procedureTask->name = $request->name;
-                $procedureTask->content = $request->content;
-                $procedureTask->amount_of_work = $request->amount_of_work;
+    	
+        if(!$procedureTask) {
 
-                $procedureTask->save();
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->object_id = $id;
+            $log->response_code = 400;
+            $log->save();
 
-                $log = new Log;
-                $log->action = 'User id '. $request->user_id . ' update  procedure task id-'.$id; 
-                $log->save();
+            return response()->json(['message' => 'Procedure task  does not exist!']);
+        } else {
+            $procedureTask->name = $request->name;
+            $procedureTask->content = $request->content;
+            $procedureTask->amount_of_work = $request->amount_of_work;
 
-                return response()->json(['message' => 'The task was updated!','task' => $procedureTask],200);
-            }
+            $procedureTask->save();
+
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->object_id = $id;
+            $log->response_code = 200;
+            $log->save();
+
+            return response()->json(['message' => 'The task was updated!','task' => $procedureTask],200);
+        }
     		
-    	}
     }
 
-    public function delete($id){
+    public function delete(Request $request,$id){
     	$procedureTask = ProcedureTask::find($id);
     	if (!$procedureTask) {
     		return response()->json(['message' => 'The task  does not exist!']);
     	} else {
-            $step = $procedureTask->step;
-    		$procedureTask->delete();
-            $stepAfter = ProcedureTask::where('step','>',$step)->get();
-            foreach ($stepAfter as $task) {
-                $task->step -= 1;
-            }
+            if ($procedureTask->status == 1) {
+                return response()->json(['message' => 'The task was complete. Can not delete this task!']);
+            } else {
+                $log = $this->newLog($request);
+                $log->type = "procedure-task";
+                $log->object_id = $procedureTask->id;
+                $log->response_code = 200;
+                $log->save();
 
-            $log = new Log;
-            $log->action = 'User id '. $request->user_id . ' delete  procedure task id-'.$id; 
-            $log->save();
-
-    		return response()->json(['message' => 'The task  was deleted!']);
+                $procedureTask->delete();
+                return response()->json(['message' => 'The task  was deleted!']);
+            }	
     	}
     }
 
@@ -180,12 +200,15 @@ class ProcedureTaskController extends Controller
 
     		$procedureTask->implementer = $request->implementer;
 	    	$procedureTask->deadline = $request->deadline;
+            $procedureTask->started_at = date("Y-m-d H:i:s");
 
 	    	$procedureTask->save();
-
-            $log = new Log;
-            $log->action = 'User id '. $request->user_id . ' assign user for procedure task id-'.$id; 
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->object_id = $procedureTask->id;
+            $log->response_code = 200;
             $log->save();
+
 
 	    	return response()->json(['message' => 'Assign user for task successfully!','task' => $procedureTask]);
     	}
@@ -198,11 +221,18 @@ class ProcedureTaskController extends Controller
     	if (!$procedureTask) {
     		return response()->json(['message' => 'The task  does not exist!']);
     	} else {
-    		$procedureTask->amount_of_accomplished_work = $request->amount_of_accomplished_work;
+            if ($request->amount_of_accomplished_work > $procedureTask->amount_of_work) {
+                $procedureTask->amount_of_accomplished_work = $procedureTask->amount_of_work;   
+            } else {
+                $procedureTask->amount_of_accomplished_work = $request->amount_of_accomplished_work;
+            }
+    		
 	    	$procedureTask->save();
 
-            $log = new Log;
-            $log->action = 'User id '. $request->user_id . ' update progress of  procedure task id-'.$id; 
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->object_id = $procedureTask->id;
+            $log->response_code = 200;
             $log->save();
 
 	    	return response()->json(['message' => 'Update progress of task successfully!','task' => $procedureTask]);
@@ -210,7 +240,7 @@ class ProcedureTaskController extends Controller
     }
 
 
-    public function markTaskDone($id){
+    public function markTaskDone(Request $request,$id){
     	$procedureTask = ProcedureTask::find($id);
     	if (!$procedureTask) {
     		return response()->json(['message' => 'The task  does not exist!']);
@@ -219,10 +249,13 @@ class ProcedureTaskController extends Controller
     			return response()->json(['message' => 'The task has not been complete, can not mark it done!']);
     		} else {
     			$procedureTask->status = 1;
+                $procedureTask->finished_at = date("Y-m-d H:i:s");
 		    	$procedureTask->save();
 
-                $log = new Log;
-                $log->action = 'User id '. $request->user_id . ' mark done procedure task id-'.$id; 
+                $log = $this->newLog($request);
+                $log->type = "procedure-task";
+                $log->object_id = $procedureTask->id;
+                $log->response_code = 200;
                 $log->save();
 
 		    	return response()->json(['message' => 'Mark task been done  successfully!','task' => $procedureTask]);
@@ -263,6 +296,11 @@ class ProcedureTaskController extends Controller
                 array_push($tasks , $task);
             }
 
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->response_code = 200;
+            $log->save();
+
             return response()->json($tasks);
         } 
 
@@ -281,6 +319,12 @@ class ProcedureTaskController extends Controller
                     array_push($data, $task_info);
                 }
             }
+
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->response_code = 200;
+            $log->save();
+
             return response()->json($data);
         }
 
@@ -302,9 +346,20 @@ class ProcedureTaskController extends Controller
                 
             }
 
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->response_code = 200;
+            $log->save();
+
             return response()->json($tasks);
 
         } else if (($request->start_from && !$request->start_to) || (!$request->start_from && $request->start_to)){
+
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->response_code = 400;
+            $log->save();
+
             return response()->json(['message' => 'Require both start_from and start_to to filter']);
         }
 
@@ -325,16 +380,27 @@ class ProcedureTaskController extends Controller
                 } 
             }
 
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->response_code = 200;
+            $log->save();
+
             return response()->json($tasks);
 
         } else if (($request->finish_from && !$request->finish_to) || (!$request->finish_from && $request->finish_to)){
+
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->response_code = 400;
+            $log->save();
+
             return response()->json(['message' => 'Require both finish_from and finish_to to filter']);
         }
         
     }
 
 
-    public function getListTask(){
+    public function getListTask(Request $request){
         $procedureTasks = ProcedureTask::all();
 
         $tasks = array();
@@ -379,6 +445,11 @@ class ProcedureTaskController extends Controller
 
             array_push($tasks, $task);
         }
+
+        $log = $this->newLog($request);
+        $log->type = "procedure-task";
+        $log->response_code = 200;
+        $log->save();
 
         return response()->json($tasks);
     }
@@ -432,6 +503,18 @@ class ProcedureTaskController extends Controller
                 return false;
             }
         }
+    }
+
+
+    public function newLog(Request $request){
+        $log = new Log;
+        $log->ip = $request->ip();
+        $log->created_time = time();
+        $log->method = $request->method();
+        $log->path = $request->getRequestUri();
+        $log->data_send = json_encode($request->all());
+
+        return $log;
     }
 
 }

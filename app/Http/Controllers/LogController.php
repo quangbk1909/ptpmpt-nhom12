@@ -12,7 +12,8 @@ class LogController extends Controller
     public function getLogs(){
     	//$logs = Log::all();
     	$logs = DB::table('logs')->get();
-    	return response()->json($logs); 
+
+    	return response()->json(['count' => $logs->count(), 'results' => $logs]); 
     }
 
 

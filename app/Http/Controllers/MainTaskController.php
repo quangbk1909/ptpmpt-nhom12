@@ -14,12 +14,18 @@ use \Datetime;
 class MainTaskController extends Controller
 {
 
-	public function getMainTaskList(){
+	public function getMainTaskList(Request $request){
 		$mainTasks = MainTask::all();
+
+		$log = $this->newLog($request);
+        $log->type = "main-task";
+        $log->response_code = 200;
+        $log->save();
+
 		return response()->json($mainTasks);
 	}
 
-    public function show(){
+    public function show(Request $request){
 		$mainTask = MainTask::orderBy('created_at', 'desc')->get();
 		$tasks = array();
 		$departments = $this->getAllDepartment();
@@ -75,22 +81,40 @@ class MainTaskController extends Controller
     		array_push($tasks , $task);
     	}
 
+    	$log = $this->newLog($request);
+        $log->type = "main-task";
+        $log->response_code = 200;
+        $log->save();
+
 		return response()->json($tasks, 200);
 	}
 
-	public function getMainTaskByProcedure($id){
+	public function getMainTaskByProcedure(Request $request,$id){
 		$procedure = Procedure::find($id);
 		if (!$procedure) {
 			return response()->json (['message' => 'Procedure does not exist!']);
 		} else {
+
+			$log = $this->newLog($request);
+		    $log->type = "main-task";
+		    $log->response_code = 200;
+		    $log->save();
+
 			return response()->json ($procedure->mainTasks);
 		}
 	}
 
 
-	public function getProcedureTasksList($id){
+	public function getProcedureTasksList(Request $request,$id){
 		$mainTask = MainTask::find($id);
 		if($mainTask) {
+
+			$log = $this->newLog($request);
+		    $log->type = "main-task";
+		    $log->object_id = $mainTask->id;
+		    $log->response_code = 200;
+		    $log->save();
+
 			return response()->json($mainTask->procedureTasks);
 		} else {
 			return response()->json (['message' => 'Main task does not exist!']); 
@@ -98,7 +122,7 @@ class MainTaskController extends Controller
 	}
 
 
-	public function showDetail($id){
+	public function showDetail(Request $request,$id){
 		$mainTask = MainTask::find($id);
     	if ($mainTask){
     		$procedure = $mainTask->procedure;
@@ -130,6 +154,12 @@ class MainTaskController extends Controller
                 }
             }
 
+            $log = $this->newLog($request);
+		    $log->type = "main-task";
+		    $log->object_id = $mainTask->id;
+		    $log->response_code = 200;
+		    $log->save();
+
     		return response()->json ($mainTask);
     	} else {
     		return response()->json (['message' => 'Main task does not exist!']);
@@ -138,7 +168,7 @@ class MainTaskController extends Controller
 
 
 
-	public function getProcedureTasks($id){
+	public function getProcedureTasks(Request $request,$id){
 		$procedureTasks = ProcedureTask::where('main_task_id','=',$id)->orderBy('step', 'desc')->get();
 
 		$tasks = array();
@@ -176,6 +206,12 @@ class MainTaskController extends Controller
                 }
             }
 
+            $log = $this->newLog($request);
+		    $log->type = "main-task";
+		    $log->object_id = $id;
+		    $log->response_code = 200;
+		    $log->save();
+
             array_push($tasks , $task);
         }
 
@@ -199,7 +235,7 @@ class MainTaskController extends Controller
         	$procedure = Procedure::find($request->procedure_id);
 	    	// call api check user exist with id creator
 	    	if(!$procedure) {
-	    		return response()->json(['message' => 'Main task  does not exist!']);
+	    		return response()->json(['message' => 'Procedure does not exist!']);
 	    	} else if(0){
 	    		return response()->json(['message' => 'The user who created this task  does not exist!']);
 	    	} else {
@@ -210,12 +246,15 @@ class MainTaskController extends Controller
 	    		$mainTask->procedure_id = $request->procedure_id;
 	    		$mainTask->creator = $request->creator;
 	    		$mainTask->responsible_person = $request->responsible_person;
+	    		$mainTask->department_id = $request->department_id;
 
 	    		$mainTask->save();
 
-	    		$log = new Log;
-                $log->action = 'User id '. $request->creator . ' create new main task'; 
-                $log->save();
+	    		$log = $this->newLog($request);
+			    $log->type = "main-task";
+			    $log->object_id = $mainTask->id;
+			    $log->response_code = 200;
+			    $log->save();
 
 	    		return response()->json(['message' => 'Create main task successfully!','main-task' => $mainTask],200);
 	    	}
@@ -251,12 +290,16 @@ class MainTaskController extends Controller
 		    		$mainTask->deadline = $request->deadline;
 		    		$mainTask->procedure_id = $request->procedure_id;
 		    		$mainTask->responsible_person = $request->responsible_person;
+		    		$mainTask->department_id = $request->department_id;
 
 		    		$mainTask->save();
 
-		    		$log = new Log;
-                    $log->action = 'User id '. $request->user_id . ' update main task id-'.$id; 
-                    $log->save();
+		    		$log = $this->newLog($request);
+				    $log->type = "main-task";
+				    $log->object_id = $mainTask->id;
+				    $log->response_code = 200;
+				    $log->save();
+		    		
 		    		return response()->json(['message' => 'Update main task successfully!','main-task' => $mainTask],200);
 		    	}
 		    }
@@ -273,14 +316,16 @@ class MainTaskController extends Controller
 		} else {
 			$mainTask->delete();
 
-			$log = new Log;
-            $log->action = 'User id '. $request->user_id . ' delete  main task id-'.$id; 
-            $log->save();
+			$log = $this->newLog($request);
+		    $log->type = "main-task";
+		    $log->object_id = $id;
+		    $log->response_code = 200;
+		    $log->save();
     		return response()->json(['message' => 'Delete main task successfully!'], 200);
 		}
 	}
 
-	public function finish($id){
+	public function finish(Request $request,$id){
 		$mainTask = MainTask::find($id);
 		if (!$mainTask) {
 			return response()->json(['message' => 'Main task  does not exist!']);
@@ -293,19 +338,33 @@ class MainTaskController extends Controller
 				if (!$procedureTasks) {
 					return response()->json(['message' => 'Main task has not procedural task!']);
 				} else {
+					$lastProcedureTask = ProcedureTask::where('main_task_id', '=', $id)->orderBy('step','desc')->first();
+					$lastStep = $mainTask->procedure->procedureSteps->sortByDesc('step')->first();
+					if ($lastProcedureTask->step < $lastStep->step) {
+						$flag = false;
+					}
 					foreach ($procedureTasks as $task) {
 						if ($task->status == 0){
 							$flag = False;
 							break;
 						}
 					}
+
+
 					if ($flag) {
 						$mainTask->status = 1;
 						$mainTask->finished_at = date("Y-m-d H:i:s");
 						$mainTask->save();
+
+						$log = $this->newLog($request);
+					    $log->type = "main-task";
+					    $log->object_id = $maintask->id;
+					    $log->response_code = 200;
+					    $log->save();
+
 						return response()->json(['message' => 'Main task  has been finished!']);
 					} else {
-						return response()->json(['message' => 'All procedural task in main task has not been finished. Can not finish main task!']);
+						return response()->json(['message' => 'All procedure step in procedure of main task  has not been finished. Can not finish main task!']);
 					}
 				}
 			}
@@ -392,6 +451,18 @@ class MainTaskController extends Controller
                 return false;
             }
         }
+    }
+
+
+    public function newLog(Request $request){
+        $log = new Log;
+        $log->ip = $request->ip();
+        $log->created_time = time();
+        $log->method = $request->method();
+        $log->path = $request->getRequestUri();
+        $log->data_send = json_encode($request->all());
+
+        return $log;
     }
 
 

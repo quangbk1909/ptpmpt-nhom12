@@ -8,10 +8,11 @@ use App\ProcedureType;
 use Illuminate\Http\Request;
 use Validator;
 use GuzzleHttp\Client;
+use App\ProcedureStep;
 
 class ProcedureController extends Controller
 {
-    public function getAllProcedures(){
+    public function getAllProcedures(Request $request){
     	$allProcedures = Procedure::all();
     	$procedureList = array();
 
@@ -39,6 +40,12 @@ class ProcedureController extends Controller
 
     	}
 
+        $log = $this->newLog($request);
+        $log->type = "procedure";
+        $log->response_code = 200;
+        $log->save();
+
+
     	return response()->json($procedureList, 200);
     }
 
@@ -54,7 +61,7 @@ class ProcedureController extends Controller
     }
 
 
-    public function getDetailProcedure($id){
+    public function getDetailProcedure(Request $request,$id){
     	$procedure = Procedure::find($id);
     	if ($procedure){
     		$procedureType = $procedure->procedureType;
@@ -66,8 +73,21 @@ class ProcedureController extends Controller
                  $procedure->added_by_detail = "User does not exist";
             }
 
+            $log = $this->newLog($request);
+            $log->type = "procedure";
+            $log->object_id = $procedure->id;
+            $log->response_code = 200;
+            $log->save();
+
     		return response()->json ($procedure);
     	} else {
+
+            $log = $this->newLog($request);
+            $log->type = "procedure";
+            $log->object_id = $procedure->id;
+            $log->response_code = 400;
+            $log->save();
+
     		return response()->json (['message' => 'Procedure does not exist!']);
     	}
     }
@@ -99,11 +119,13 @@ class ProcedureController extends Controller
         		$procedure->added_by = $request->added_by;
 		    	$procedure->save();
 
-                $log = new Log;
-                $log->action = 'User id '. $request->added_by . ' create new procedure'; 
+                $log = $this->newLog($request);
+                $log->type = "procedure";
+                $log->object_id = $procedure->id;
+                $log->response_code = 200;
                 $log->save();
 
-        		return response()->json(['message' => 'Create procedure successfully!','procedure' => $procedure], 201);
+        		return response()->json(['message' => 'Create procedure successfully!','procedure' => $procedure]);
         	}        	
        }
     }
@@ -136,8 +158,10 @@ class ProcedureController extends Controller
 		    		$procedure->content = $request->content;
 			    	$procedure->save();
 
-                    $log = new Log;
-                    $log->action = 'User id '. $request->user_id . ' update  procedure id-'.$id; 
+                    $log = $this->newLog($request);
+                    $log->type = "procedure";
+                    $log->object_id = $procedure->id;
+                    $log->response_code = 200;
                     $log->save();
 
 		    		return response()->json(['message' => 'Update procedure successfully!','procedure' => $procedure], 200);
@@ -154,11 +178,13 @@ class ProcedureController extends Controller
     	if (!$procedure) {
     		return response()->json(['message' => 'Procedure  does not exist!']);
     	} else {
+            $log = $this->newLog($request);
+            $log->type = "procedure";
+            $log->object_id = $procedure->id;
+            $log->response_code = 200;
+            $log->save();
     		$procedure->delete();
 
-            $log = new Log;
-            $log->action = 'User id '. $request->user_id . ' delete  procedure id-'.$id; 
-            $log->save();
 
     		return response()->json(['message' => 'Delete procedure successfully!'], 200);
     	}
@@ -189,6 +215,17 @@ class ProcedureController extends Controller
                 return false;
             }
         }
+    }
+
+    public function newLog(Request $request){
+        $log = new Log;
+        $log->ip = $request->ip();
+        $log->created_time = time();
+        $log->method = $request->method();
+        $log->path = $request->getRequestUri();
+        $log->data_send = json_encode($request->all());
+
+        return $log;
     }
 
 
