@@ -24,10 +24,10 @@ class ProcedureController extends Controller
             $procedureSteps = $procedure->procedureSteps;
 
             foreach ($users as $user) {
-                    if ($user->id = $procedure->added_by) {
-                        $creator = $user;
-                    }
+                if ($user->id == $procedure->added_by) {
+                    $creator = $user;
                 }
+            }
 
             if($user){
                 $procedure->added_by_detail = $creator;
@@ -263,6 +263,76 @@ class ProcedureController extends Controller
         $procedureTypes = ProcedureType::all();
         return view('procedure.create',compact('procedureTypes'));
     }
+
+
+    public function postCreate(Request $request){ 
+
+        $validator = Validator::make($request->all(), [
+                            'title' => 'required|unique:procedures',
+                        ],
+                        [
+                            'unique' => ':attribute already exist!'
+                        ],
+                        [
+                            'title' => 'Title'
+                        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->with("errors",$validator->errors());
+        } else {
+            $procedureType = ProcedureType::find($request->procedure_type_id);
+            if (!$procedureType) {
+                $errors = collect(["Procedure type does not exist!"]);
+                return redirect()->back()->with("errors",$errors);
+            } else if(0){
+                // get user en check user exist
+            } else{
+                $procedure = new Procedure;
+                $procedure->title = $request->title;
+                $procedure->procedure_type_id = $request->procedure_type_id;
+                $procedure->content = $request->content;
+                $procedure->added_by = $request->added_by;
+                $procedure->save();
+
+                for ($i = 0; $i < count($request->steps); $i++) {
+                    $procedureStep = new ProcedureStep;
+                    $procedureStep->step = $i + 1;
+                    $procedureStep->content = $request->steps[$i];
+                    $procedureStep->procedure_id = $procedure->id;
+                    $procedureStep->save();
+                }
+
+                $log = $this->newLog($request);
+                $log->type = "procedure";
+                $log->object_id = $procedure->id;
+                $log->response_code = 200;
+                $log->save();
+
+                return redirect()->back()->with('success', 'Create procedure successfully!');
+            }           
+        }
+    }
+
+
+    public function getDelete(Request $request, $id){
+        $procedure = Procedure::find($id);
+        if (!$procedure) {
+            $errors = collect(["Procedure does not exist!"]);
+            return redirect()->back()->with("errors",$errors);
+        } else {
+            $log = $this->newLog($request);
+            $log->type = "procedure";
+            $log->object_id = $procedure->id;
+            $log->response_code = 200;
+            $log->save();
+            $procedure->delete();
+
+
+            return redirect()->back()->with('success', 'Delete procedure successfully!');
+        }
+    }
+
+
+
 
     
 }

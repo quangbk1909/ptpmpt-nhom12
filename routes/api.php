@@ -113,7 +113,7 @@ Route::group(['prefix'=>'configuration-management'], function() {
 });
 
 
-Route::get('test', 'ProcedureTaskController@testRequest');
+Route::get('test', 'ProcedureTaskController@getAllUser');
 
 
 

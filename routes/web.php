@@ -26,6 +26,28 @@ Route::group(['prefix' => 'procedure'], function() {
 
     Route::get('create','ProcedureController@getCreate');
 
+    Route::post('create','ProcedureController@postCreate');
 
+    Route::get('delete/{id}','ProcedureController@getDelete');
 
 });
+
+Route::group(['prefix' => 'main-task'], function() {
+    
+    Route::get('show', 'MainTaskController@getAllMaintask');
+
+    Route::get('{id}/procedure-tasks','MainTaskController@getProcedureTasksView');
+
+    Route::get('create','MainTaskController@getCreate');
+
+    Route::post('create','MainTaskController@postCreate');
+
+    Route::get('delete/{id}','MainTaskController@getDelete');
+
+    Route::get('update/{id}','MainTaskController@getUpdate');
+
+    Route::post('update/{id}','MainTaskController@postUpdate');
+
+});
+
+

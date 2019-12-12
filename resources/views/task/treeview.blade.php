@@ -1,16 +1,19 @@
 <li>
 	<span>
-		@if ($category->hasChildren())
+		@if ($mainTask->checkStepHasTask($step->step))
 			<i class="fas fa-minus"></i>
 		@endif	
-		{{$category->name}}
+		{{$step->content}}
 	</span>
-	@if ($category->hasChildren())
+	@if ($mainTask->checkStepHasTask($step->step))
 		<ul>
-		@foreach ($category->currentChild() as $category)
+			@foreach($mainTask->getTaskByStep($step->step) as $task)
+				<li>{{$task->name}}</li>
+			@endforeach
+		{{-- @foreach ($category->currentChild() as $category)
 			@include('category.treeview', $category)
-		@endforeach
-	</ul>
+		@endforeach --}}
+		</ul>
 	@endif
 	
 </li>

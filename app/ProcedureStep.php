@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class ProcedureStep extends Model
 {
     protected $table = "procedure_steps";
-    public $timestamp = false;
+
+    public $timestamps = false;
 
     public function procedure(){
     	return $this->belongsTo('App\Procedure','procedure_id', 'id');

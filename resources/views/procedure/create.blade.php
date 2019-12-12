@@ -33,7 +33,7 @@
 	@endif
 
 
-    <form action="post/create" method="POST" enctype="multipart/form-data" >
+    <form action="procedure/create" method="POST" enctype="multipart/form-data" >
 		@csrf
     <!-- Create post content -->
 	<div class="row">
@@ -51,7 +51,7 @@
 
 				<div class="form-group">
 					<label for="type">Type</label>
-					<select class="form-control" name="type" id="type">
+					<select class="form-control" name="procedure_type_id" id="procedure_type_id">
 						@foreach($procedureTypes as $type)
 							<option value="{{$type->id}}">{{ucfirst($type->name)}}</option>
 						@endforeach	
@@ -62,6 +62,7 @@
 					<label for="content">Content</label>
 					<input type="textarea" name="content" style="min-height: 300px;" > 
 				</div>
+				<input type="hidden" name="added_by" value="4614718215946240" >
 			</div>		
     	</div>
 
@@ -76,7 +77,6 @@
 					<div class=" m-2">
 						<div class="form-group input_fields_wrap">
 						    <button class="btn btn-success btn-block my-2 add_field_button">Add step</button>
-						    <label for="">Step : </label>
 						    <input type="text" class="my-1" name="steps[]" placeholder="Enter name of step">
 						</div>
 
@@ -111,7 +111,7 @@
 				e.preventDefault();
 				if(x < max_fields){ //max input box allowed
 					x++; //text box increment
-					$(wrapper).append('<div><label for="">Step : </label><input type="text" class="my-1" name="steps[]" placeholder="Enter name of step"><a href="#" class="remove_field mr-auto">Remove</a></div>'); //add input box
+					$(wrapper).append('<div><input type="text" class="my-1" name="steps[]" placeholder="Enter name of step"><a href="#" class="remove_field mr-auto">Remove</a></div>'); //add input box
 				}
 			});
 			

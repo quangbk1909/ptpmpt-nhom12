@@ -18,10 +18,10 @@
             </a>
             <ul class="collapse list-unstyled" id="postSubmenu">
                 <li>
-                    <a href="post/show" class="active">Show</a>
+                    <a href="procedure/show" class="active">Show</a>
                 </li>
                 <li>
-                    <a href="post/create">Create</a>
+                    <a href="procedure/create">Create</a>
                 </li>
             </ul>
         </li>
@@ -32,10 +32,10 @@
             </a>
             <ul class="collapse list-unstyled" id="categorySubmenu">
                 <li>
-                    <a href="category/show" class="active">Show</a>
+                    <a href="main-task/show" class="active">Show</a>
                 </li>
                 <li>
-                    <a href="category/create">Create</a>
+                    <a href="main-task/create">Create</a>
                 </li>
             </ul>
         </li>

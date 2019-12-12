@@ -38,8 +38,9 @@ class MainTaskController extends Controller
 
     		if ($task->creator != null) {
                 foreach ($users as $user) {
-                    if ($user->id = $task->creator) {
+                    if ($user->id == $task->creator) {
                         $creator = $user;
+                        break;
                     }
                 }
                 if ($creator){
@@ -51,8 +52,9 @@ class MainTaskController extends Controller
 
             if ($task->responsible_person != null) {
                 foreach ($users as $user) {
-                    if ($user->id = $task->responsible_person) {
+                    if ($user->id == $task->responsible_person) {
                         $responsible_person = $user;
+                        break;
                     }
                 }
 
@@ -66,8 +68,9 @@ class MainTaskController extends Controller
             if ($task->department_id != null) {
                 $depart = null;
                 foreach ($departments as $department) {
-                    if ($department->id = $task->department_id) {
+                    if ($department->_id == $task->department_id) {
                         $depart = $department;
+                        break;
                     }
                 }
 
@@ -189,7 +192,7 @@ class MainTaskController extends Controller
                 //$creator = null;
                 // $creator = $this->getUser($task->creator);
                 foreach ($users as $user) {
-                    if ($user->id = $task->creator) {
+                    if ($user->id == $task->creator) {
                         $creator = $user;
                     }
                 }
@@ -203,7 +206,7 @@ class MainTaskController extends Controller
             if ($task->implementer != null) {
                 //$implementer = $this->getUser($task->implementer);
                 foreach ($users as $user) {
-                    if ($user->id = $task->implementer) {
+                    if ($user->id == $task->implementer) {
                         $implementer = $user;
                     }
                 }
@@ -474,5 +477,245 @@ class MainTaskController extends Controller
         return $log;
     }
 
+
+
+    //view
+    public function getAllMaintask(Request $request){
+
+		$mainTask = MainTask::all();
+		$tasks = array();
+		$departments = $this->getAllDepartment();
+		$users = $this->getAllUser();
+
+		foreach ($mainTask as $task) {
+
+    		$date = new DateTime(date("Y-m-d H:i:s"));
+			$deadline = new DateTime($task->deadline);
+			if ($date < $deadline) {
+				$task->overdue = 0;
+			} else {
+				$task->overdue = 1;
+			}
+
+    		if ($task->creator != null) {
+                foreach ($users as $user) {
+                    if ($user->id == $task->creator) {
+                        $creator = $user;
+                    }
+                }
+                if ($creator){
+                    $task->creator_detail = $creator;
+                } else {
+                     $task->creator_detail = "User does not exist";
+                }
+            }
+
+            if ($task->responsible_person != null) {
+                foreach ($users as $user) {
+                    if ($user->id == $task->responsible_person) {
+                        $responsible_person = $user;
+                    }
+                }
+
+                if ($responsible_person){
+                    $task->responsible_person_detail = $responsible_person;
+                } else {
+                     $task->responsible_person_detail = "User does not exist";
+                }
+            }
+
+            if ($task->department_id != null) {
+                $depart = null;
+                foreach ($departments as $department) {
+                    if ($department->_id == $task->department_id) {
+                        $depart = $department;
+                    }
+                }
+
+                if ($depart){
+                    $task->department_detail = $depart;
+                } else {
+                     $task->department_detail = "Department does not exist";
+                }
+            }
+
+    		array_push($tasks , $task);
+    	}
+
+    	$log = $this->newLog($request);
+        $log->type = "main-task";
+        $log->response_code = 200;
+        $log->save();
+
+    	return view("task.maintask", compact('tasks'));
+    }
+
+
+    public function getProcedureTasksView(Request $request,$id){
+    	$mainTask = MainTask::find($id);
+
+    	$procedureTasks = $mainTask->procedureTasks;
+		$users = $this->getAllUser();
+        foreach ($procedureTasks as $task) {
+            $procedureStep =  $task->procedureStep;
+
+            if ($task->creator != null) {
+                //$creator = null;
+                // $creator = $this->getUser($task->creator);
+                foreach ($users as $user) {
+                    if ($user->id == $task->creator) {
+                        $creator = $user;
+                    }
+                }
+
+                if ($creator){
+                    $task->creator_detail = $creator;
+                } else {
+                     $task->creator_detail = "User does not exist";
+                }
+            } 
+
+            if ($task->implementer != null) {
+                //$implementer = $this->getUser($task->implementer);
+                foreach ($users as $user) {
+                    if ($user->id == $task->implementer) {
+                        $implementer = $user;
+                    }
+                }
+
+                if ($implementer){
+                    $task->implementer_detail = $implementer;
+                } else {
+                     $task->implementer_detail = "User does not exist";
+                }
+            }
+
+            $log = $this->newLog($request);
+		    $log->type = "main-task";
+		    $log->object_id = $id;
+		    $log->response_code = 200;
+		    $log->save();
+
+        }
+    	return view('task.show',compact('mainTask','procedureTasks'));
+    }
+
+
+    public function getCreate(){
+    	$procedures = Procedure::all();
+    	return view('task.maintaskcreate', compact('procedures'));
+    }
+
+
+    public function postCreate(Request $request){
+    	$validator = Validator::make($request->all(), [
+			    		'name' => 'required|unique:main_tasks',
+			    	],
+			    	[
+			    		'unique' => ':attribute already exist!'
+			    	],
+			    	[
+			    		'name' => 'Name'
+			    	]);
+        if ($validator->fails()) {
+            return redirect()->back()->with("errors",$validator->errors());
+        } else {
+        	$procedure = Procedure::find($request->procedure_id);
+	    	// call api check user exist with id creator
+	    	if(!$procedure) {
+	    		$errors = collect(["Procedure does not exist!"]);
+            	return redirect()->back()->with("errors",$errors);
+	    	} else if(0){
+	    		return response()->json(['message' => 'The user who created this task  does not exist!']);
+	    	} else {
+	    		$mainTask = new MainTask;
+		    	$mainTask->name = $request->name;
+		    	$mainTask->description = $request->description;
+		    	$mainTask->deadline = date('Y-m-d H:i:s',strtotime($request->deadline));
+		    	$mainTask->procedure_id = $request->procedure_id;
+		    	$mainTask->creator = $request->creator;
+		    	$mainTask->responsible_person = $request->responsible_person;
+		    	$mainTask->department_id = $request->department_id;
+		    	$mainTask->save();
+
+
+	    		$log = $this->newLog($request);
+			    $log->type = "main-task";
+			    $log->object_id = $mainTask->id;
+			    $log->response_code = 200;
+			    $log->save();
+
+	    		return redirect()->back()->with('success','Create main task successfully!');
+	    	}
+        }	
+    }
+
+
+    public function getUpdate($id){
+    	$mainTask = MainTask::find($id);
+    	if ($mainTask->status == 1){
+    		return redirect()->back()->with('warning','Main task has been complete. Can not be updated!');
+    	}else {
+    		return view('task.maintaskedit', compact('mainTask'));
+    	}
+    }
+
+
+    public function postUpdate(Request $request, $id){
+    	$mainTask = MainTask::find($id);
+		if (!$mainTask) {
+			$errors = collect(["Main task does not exist!"]);
+            return redirect()->back()->with("errors",$errors);
+		} else {
+			$validator = Validator::make($request->all(), [
+			    		'name' => 'required|unique:main_tasks,name,'.$id,
+			    	],
+			    	[
+			    		'unique' => ':attribute already exist!'
+			    	],
+			    	[
+			    		'name' => 'Name'
+			    	]);
+	        if ($validator->fails()) {
+	            return redirect()->back()->with("errors",$validator->errors());
+	        } else {
+	    		$mainTask->name = $request->name;
+	    		$mainTask->description = $request->description;
+	    		$mainTask->deadline = date('Y-m-d H:i:s',strtotime($request->deadline));
+	    		$mainTask->responsible_person = $request->responsible_person;
+
+	    		$mainTask->save();
+
+	    		$log = $this->newLog($request);
+			    $log->type = "main-task";
+			    $log->object_id = $mainTask->id;
+			    $log->response_code = 200;
+			    $log->save();
+	    		
+	    		return response()->json(['message' => 'Update main task successfully!','main-task' => $mainTask],200);
+	    	
+		    }
+		}
+		
+
+    }
+
+
+    public function getDelete(Request $request, $id){
+    	$mainTask = MainTask::find($id);
+		if (!$mainTask) {
+			$errors = collect(["Main task does not exist!"]);
+            return redirect()->back()->with("errors",$errors);
+		} else {
+			$mainTask->delete();
+
+			$log = $this->newLog($request);
+		    $log->type = "main-task";
+		    $log->object_id = $id;
+		    $log->response_code = 200;
+		    $log->save();
+    		return redirect()->back()->with('success', 'Delete maint task successfully!');
+		}
+    }
 
 }

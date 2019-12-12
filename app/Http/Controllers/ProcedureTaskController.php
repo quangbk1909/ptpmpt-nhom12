@@ -404,7 +404,7 @@ class ProcedureTaskController extends Controller
                 //$creator = null;
                 // $creator = $this->getUser($task->creator);
                 foreach ($users as $user) {
-                    if ($user->id = $task->creator) {
+                    if ($user->id == $task->creator) {
                         $creator = $user;
                     }
                 }
@@ -418,7 +418,7 @@ class ProcedureTaskController extends Controller
             if ($task->implementer != null) {
                 //$implementer = $this->getUser($task->implementer);
                 foreach ($users as $user) {
-                    if ($user->id = $task->implementer) {
+                    if ($user->id == $task->implementer) {
                         $implementer = $user;
                     }
                 }

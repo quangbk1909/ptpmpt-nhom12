@@ -21,7 +21,7 @@
             </h1>
         </div>
         <div class="col-md-2 d-flex align-content-center justify-content-center p-2">
-            <a href="procedure/create" class="btn btn-primary">Create new procedure</a>  
+            <a href="procedure/create" class="btn btn-primary">Create main task</a>  
         </div>
     </div>
     <hr>
@@ -63,31 +63,55 @@
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
-                    <th>Type</th>
                     <th>Description</th>
-                    <th>Adder</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th>Finish</th>
+                    <th>Procedure</th>
+                    <th>Creator</th>
+                    <th>Responsible person</th>
+                    <th>Department</th>
                     <th>Create</th>
-                    <th>Update</th>
-                    <th>Detail step</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($procedures as $procedure)
+                @foreach ($tasks as $task)
                     <tr>
-                        <td>{{$procedure->id}}</td>
-                        <td>{{$procedure->title}}</td>
-                        <td>{{$procedure->procedureType->name}}</td>
-                        <td>{{substr($procedure->content,0,50)}} ...</td>
-                        <td>{{$procedure->adder->name}}</td>
-                        <td>{{$procedure->created_at}}</td>
-                        <td>{{$procedure->updated_at}}</td>
-                        <td> Number steps: {{$procedure->procedureSteps->count()}}
-                            @foreach ($procedure->procedureSteps as $step)
-                            <p style="color: #3F3F3F; font-size: 16px;">Step {{$step->step}} : {{$step->content}}</p>
-                            @endforeach
-                        </td>
-                        <td><a href="category/edit/"><i class="fas fa-pencil-alt"></i> Edit</a> | <a href="procedure/delete/{{$procedure->id}}"  onclick="return confirm('Are you sure to delete category ?');"><i class="fas fa-trash-alt"></i> Delete</a></td>
+                        <td>{{$task->id}}</td>
+                        <td>{{$task->name}}</td>
+                        <td>{{substr($task->description,0,50)}} ...</td>
+                        <td>{{$task->deadline}}</td>
+                        @if($task->status == 1)
+                        	<td>Complete</td>
+                        @else
+                        	@if($task->overdue == 0)
+                        		<td>In process</td>
+                        	@elseif($task->overdue == 1)
+                        		<td>Overdue</td>
+                        	@endif
+                        @endif
+                        <td>{{$task->finished_at}}</td>
+                        <td>{{$task->procedure->title}}</td>
+                        @if(isset($task->creator_detail->name))
+                            <td>{{$task->creator_detail->name}}</td>
+                        @else
+                            <td></td>
+                        @endif
+
+                        @if(isset($task->responsible_person_detail->name))
+                            <td>{{$task->responsible_person_detail->name}}</td>
+                        @else
+                            <td></td>
+                        @endif
+
+                        @if(isset($task->department_detail->depart_name))
+                            <td>{{$task->department_detail->depart_name}}</td>
+                        @else
+                            <td></td>
+                        @endif
+                        <td>{{$task->created_at}}</td>
+                        <td><a href="main-task/{{$task->id}}/procedure-tasks"><i class="fas fa-tasks"></i> Tasks</a> | <a href="main-task/update/{{$task->id}}"><i class="fas fa-pencil-alt"></i> Update</a> | <a href="main-task/delete/{{$task->id}}"  onclick="return confirm('Are you sure to delete category ?');"><i class="fas fa-trash-alt"></i> Delete</a></td>
                     </tr>
                 @endforeach
             </tbody>
@@ -98,4 +122,3 @@
 </div>
 
 @endsection
-
