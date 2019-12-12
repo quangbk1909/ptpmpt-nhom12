@@ -656,6 +656,7 @@ class MainTaskController extends Controller
     	if ($mainTask->status == 1){
     		return redirect()->back()->with('warning','Main task has been complete. Can not be updated!');
     	}else {
+    		$mainTask->deadline = new Datetime($mainTask->deadline);
     		return view('task.maintaskedit', compact('mainTask'));
     	}
     }
@@ -683,6 +684,25 @@ class MainTaskController extends Controller
 	    		$mainTask->description = $request->description;
 	    		$mainTask->deadline = date('Y-m-d H:i:s',strtotime($request->deadline));
 	    		$mainTask->responsible_person = $request->responsible_person;
+	    		if ($request->status == 1) {
+	    			$lastProcedureTask = $mainTask->procedureTasks->sortByDesc('step')->first();
+	    			$lastStep = $mainTask->procedure->procedureSteps->sortByDesc('step')->first();
+	    			if(!isset($lastProcedureTask) || !isset($lastStep) || $lastProcedureTask->step < $lastStep->step){
+	    				$errors = collect(["All procedure step does not complete. Can not finish main task"]);
+            			return redirect()->back()->with("errors",$errors);
+	    			}
+
+	    			$procedureTasks = $mainTask->procedureTasks;
+	    			foreach ($procedureTasks as $task) {
+	    				if($task->status == 0){
+	    					$errors = collect(["All procedure task does not complete. Can not finish main task"]);
+            				return redirect()->back()->with("errors",$errors);
+	    				}
+	    			}
+	    			$mainTask->status = 1;
+	    		}
+	    		
+
 
 	    		$mainTask->save();
 
@@ -692,7 +712,7 @@ class MainTaskController extends Controller
 			    $log->response_code = 200;
 			    $log->save();
 	    		
-	    		return response()->json(['message' => 'Update main task successfully!','main-task' => $mainTask],200);
+	    		return redirect()->back()->with('success','Update main task successfully!');
 	    	
 		    }
 		}
@@ -707,6 +727,10 @@ class MainTaskController extends Controller
 			$errors = collect(["Main task does not exist!"]);
             return redirect()->back()->with("errors",$errors);
 		} else {
+			if($mainTask->procedureTasks){
+				$errors = collect(["Main task was conducted. Cannot delete!"]);
+            	return redirect()->back()->with("errors",$errors);
+			}
 			$mainTask->delete();
 
 			$log = $this->newLog($request);

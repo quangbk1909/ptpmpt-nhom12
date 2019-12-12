@@ -110,6 +110,7 @@ Route::group(['prefix'=>'configuration-management'], function() {
     Route::post('template','ConfigurationManagementController@createTemplate');
     Route::get('template/{id}', 'ConfigurationManagementController@getTemplate');
     Route::put('template/{id}', 'ConfigurationManagementController@updateTemplate');
+
 });
 
 

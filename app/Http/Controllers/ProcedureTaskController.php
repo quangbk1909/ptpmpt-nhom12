@@ -504,4 +504,77 @@ class ProcedureTaskController extends Controller
         return $log;
     }
 
+
+    public function getCreate($idMainTask){
+        $mainTask = MainTask::find($idMainTask);
+        $lastProcedureTask = $mainTask->procedureTasks->sortByDesc('id')->first();
+        $nextStep = ProcedureStep::where([['procedure_id','=',$lastProcedureTask->procedureStep->procedure_id],['step','=',$lastProcedureTask->procedureStep->step + 1]])->first();
+        if($lastProcedureTask->status == 0){
+            $errors = collect(["All task does not complete. Can not create new task"]);
+            return redirect()->back()->with("errors",$errors);
+        }
+        return view('task.proceduretaskcreate',compact('lastProcedureTask','nextStep'));
+    }
+
+    public function postCreate(Request $request){
+        $mainTask = MainTask::find($request->main_task_id);
+        // call api check user exist with id creator
+        $lastProcedureTask = $mainTask->procedureTasks->sortByDesc('id')->first();
+        $nextStep = ProcedureStep::where([['procedure_id','=',$lastProcedureTask->procedureStep->procedure_id],['step','=',$lastProcedureTask->procedureStep->step + 1]])->first();
+        if($lastProcedureTask->status == 0){
+            $errors = collect(["All task does not complete. Can not create new task"]);
+            return redirect('main-task/'.$request->main_task_id.'/procedure-tasks')->with("errors",$errors);
+        }
+
+
+        if(!$mainTask) {
+            $errors = collect(["Main task of procedure task does not exist!"]);
+            return redirect()->back()->with("errors",$errors);
+        } else if(0){
+            return response()->json(['message' => 'The user who created this task  does not exist!']);
+        } else {
+            $procedureTask = new ProcedureTask;
+            $procedureTask->name = $request->name;
+            $procedureTask->content = $request->content;
+            $mainTask->deadline = date('Y-m-d H:i:s',strtotime($request->deadline));
+            $procedureTask->amount_of_work = $request->amount_of_work;
+            $procedureTask->main_task_id = $request->main_task_id;
+            $procedureTask->creator = $request->creator;
+            $procedureTask->procedure_step_id = $request->procedure_step_id;
+            $procedureStep = ProcedureStep::find($request->procedure_step_id);
+            $procedureTask->step = $procedureStep->step;
+
+            $procedureTask->save();
+
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->object_id = $procedureTask->id;
+            $log->response_code = 200;
+            $log->save();
+
+            return redirect('main-task/'.$request->main_task_id.'/procedure-tasks')->with('success', 'Create procedure task successfully!');
+        }
+    }
+
+    public function getDelete(Request $request, $id){
+        $procedureTask = ProcedureTask::find($id);
+        if (!$procedureTask) {
+            $errors = collect(["Procedure task does not exist!"]);
+            return redirect()->back()->with("errors",$errors);
+        } else {
+            if($procedureTask->started_at){
+                $errors = collect(["Procedure task was conducted. Cannot delete!"]);
+                return redirect()->back()->with("errors",$errors);
+            }
+            $procedureTask->delete();
+
+            $log = $this->newLog($request);
+            $log->type = "procedure-task";
+            $log->object_id = $id;
+            $log->response_code = 200;
+            $log->save();
+            return redirect()->back()->with('success', 'Delete procedure task successfully!');
+        }
+    }
+
 }

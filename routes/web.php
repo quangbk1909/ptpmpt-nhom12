@@ -51,3 +51,11 @@ Route::group(['prefix' => 'main-task'], function() {
 });
 
 
+Route::group(['prefix' => 'procedure-task'], function() {
+    Route::get('create/{idMainTask}','ProcedureTaskController@getCreate');
+
+    Route::post('create','ProcedureTaskController@postCreate');
+    Route::get('delete/{id}','ProcedureTaskController@getDelete');
+});
+
+

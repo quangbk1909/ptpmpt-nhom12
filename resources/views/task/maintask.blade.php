@@ -16,7 +16,7 @@
 <div class="bg-white p-3">
     <div class="row">
         <div class=" offset-md-1 col-md-9 mr-auto">
-            <h1><strong>Procedure</strong>
+            <h1><strong>Main Task</strong>
                 <small>List</small>
             </h1>
         </div>

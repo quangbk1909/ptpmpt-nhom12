@@ -13,7 +13,7 @@
             </h1>
         </div>
         <div class="col-md-2 d-flex align-content-center justify-content-center p-2">
-            <a href="category/create" class="btn btn-primary">Create new procedure task</a>  
+            <a href="procedure-task/create/{{$mainTask->id}}" class="btn btn-primary">Create new procedure task</a>  
         </div>
     </div>
     <hr>
@@ -32,6 +32,15 @@
             <span aria-hidden="true">&times;</span>
          </button>
          {{session('warning')}}
+    </div>
+    @endif
+
+    @if ($errors->first())
+        <div class=" col-md-11 alert alert-danger alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+         </button>
+         {{$errors->first()}}
     </div>
     @endif
 
@@ -92,7 +101,7 @@
                                 <td></td>
                             @endif
                             <td>{{$task->step}}</td>
-                            <td><a href="category/edit/"><i class="fas fa-tasks"></i> Tasks</a> | <a href="category/edit/"><i class="fas fa-pencil-alt"></i> Edit</a> | <a href="procedure/delete/"  onclick="return confirm('Are you sure to delete category ?');"><i class="fas fa-trash-alt"></i> Delete</a></td>
+                            <td> <a href="#"><i class="fas fa-pencil-alt"></i> Edit</a> | <a href="procedure-task/delete/{{$task->id}}"  onclick="return confirm('Are you sure to delete category ?');"><i class="fas fa-trash-alt"></i> Delete</a></td>
                         </tr>
                     @endforeach
                 </tbody>
