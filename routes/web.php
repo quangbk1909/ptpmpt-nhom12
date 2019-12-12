@@ -24,6 +24,8 @@ Route::group(['prefix' => 'procedure'], function() {
     
     Route::get('show', 'ProcedureController@getAllProceduresView');
 
+    Route::get('create','ProcedureController@getCreate');
+
 
 
 });

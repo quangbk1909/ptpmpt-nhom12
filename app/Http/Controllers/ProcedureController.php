@@ -36,8 +36,6 @@ class ProcedureController extends Controller
             }
 
     		array_push($procedureList , $procedure);
-
-
     	}
 
         $log = $this->newLog($request);
@@ -258,10 +256,13 @@ class ProcedureController extends Controller
             }
 
         }
-
         return view('procedure.show',compact('procedures'));
-
-
     }
+
+    public function getCreate(){
+        $procedureTypes = ProcedureType::all();
+        return view('procedure.create',compact('procedureTypes'));
+    }
+
     
 }

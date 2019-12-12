@@ -16,14 +16,8 @@ class ProcedureTaskController extends Controller
 {
 	public function getTasksCreated($userID){
 		$procedureTasks = ProcedureTask::where('creator','=',$userID)->orderBy('created_at', 'desc')->get();
-		$tasks = array();
-		foreach ($procedureTasks as $task) {
-    		$mainTask = $task->mainTask;
-    		unset($task['main_task_id']);
-    		array_push($tasks , $task);
-    	}
 
-		return response()->json($tasks, 200);
+		return response()->json($procedureTasks, 200);
 	}
 
     public function getDetailProcedure($id){
@@ -42,15 +36,8 @@ class ProcedureTaskController extends Controller
 
 
 	public function getTasksImplemented($userID){
-		$procedureTasks = ProcedureTask::where('implementer','=',$userID)->orderBy('created_at', 'desc')->get();
-		$tasks = array();
-		foreach ($procedureTasks as $task) {
-    		$mainTask = $task->mainTask;
-    		unset($task['main_task_id']);
-    		array_push($tasks , $task);
-    	}
-
-		return response()->json($tasks, 200);
+		$procedureTasks = ProcedureTask::where('implementer','=',$userID)->orderBy('created_at', 'desc')->get();	
+		return response()->json($procedureTasks, 200);
 	}
 
 

@@ -60,6 +60,7 @@
                     <th>Create</th>
                     <th>Update</th>
                     <th>Detail step</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -75,13 +76,9 @@
                         <td> Number steps: {{$procedure->procedureSteps->count()}}
                             @foreach ($procedure->procedureSteps as $step)
                             <p style="color: #3F3F3F; font-size: 16px;">Step {{$step->step}} : {{$step->content}}</p>
-
-
-
-                            
                             @endforeach
-
                         </td>
+                        <td><a href="category/edit/"><i class="fas fa-pencil-alt"></i> Edit</a> | <a href="category/delete/"  onclick="return confirm('Are you sure to delete category ?');"><i class="fas fa-trash-alt"></i> Delete</a></td>
                     </tr>
                 @endforeach
             </tbody>

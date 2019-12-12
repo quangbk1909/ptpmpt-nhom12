@@ -166,6 +166,15 @@ class MainTaskController extends Controller
     	}
 	}
 
+	public function getDetailMainTask($id){
+		$mainTask = MainTask::find($id);
+		if($mainTask) {
+			return response()->json ($mainTask);
+		} else {
+			return response()->json (['message' => 'Main task does not exist!']);
+		}
+	}
+
 
 
 	public function getProcedureTasks(Request $request,$id){

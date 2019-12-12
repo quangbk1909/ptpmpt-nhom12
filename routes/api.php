@@ -98,6 +98,8 @@ Route::get('procedure-task-list' ,'ProcedureTaskController@getListTask');
 
 Route::get('main-task-list','MainTaskController@getMainTaskList');
 
+Route::get('main-task-detail/{id}','MainTaskController@getDetailMainTask');
+
 Route::get('procedure-task-detail/{id}','ProcedureTaskController@getDetailProcedure');
 
 Route::get('proceduretask-of-maintask/{id}','MainTaskController@getProcedureTasksList');
