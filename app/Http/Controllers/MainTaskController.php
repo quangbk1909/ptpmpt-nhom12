@@ -727,7 +727,7 @@ class MainTaskController extends Controller
 			$errors = collect(["Main task does not exist!"]);
             return redirect()->back()->with("errors",$errors);
 		} else {
-			if($mainTask->procedureTasks){
+			if($mainTask->procedureTasks->count() != 0){
 				$errors = collect(["Main task was conducted. Cannot delete!"]);
             	return redirect()->back()->with("errors",$errors);
 			}
