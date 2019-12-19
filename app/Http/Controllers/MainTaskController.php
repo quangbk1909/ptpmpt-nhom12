@@ -427,9 +427,9 @@ class MainTaskController extends Controller
     }
 
     public function getDepartment($id){
-        $client = new Client(['base_uri' => 'https://dsd15-department.azurewebsites.net',]);
+        $client = new Client(['base_uri' => 'https://dsd15-log.azurewebsites.net',]);
         try {
-            $response = $client->request('GET','/Departments/'.$id);
+            $response = $client->request('GET','/Departments/'.$id.'?member=4614718215946240');
             $body = $response->getBody();
             return json_decode($body);
         } catch (\GuzzleHttp\Exception\BadResponseException $e) {
@@ -440,9 +440,9 @@ class MainTaskController extends Controller
     }
 
     public function getAllDepartment(){
-        $client = new Client(['base_uri' => 'https://dsd15-department.azurewebsites.net',]);
+        $client = new Client(['base_uri' => 'https://dsd15-log.azurewebsites.net',]);
         try {
-            $response = $client->request('GET','/Departments/');
+            $response = $client->request('GET','/Departments/getall/?member=4614718215946240');
             $body = $response->getBody();
             return json_decode($body);
         } catch (\GuzzleHttp\Exception\BadResponseException $e) {

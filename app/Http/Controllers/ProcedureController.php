@@ -117,6 +117,14 @@ class ProcedureController extends Controller
         		$procedure->added_by = $request->added_by;
 		    	$procedure->save();
 
+                for ($i = 0; $i < count($request->steps); $i++) {
+                    $procedureStep = new ProcedureStep;
+                    $procedureStep->step = $i + 1;
+                    $procedureStep->content = $request->steps[$i];
+                    $procedureStep->procedure_id = $procedure->id;
+                    $procedureStep->save();
+                }
+
                 $log = $this->newLog($request);
                 $log->type = "procedure";
                 $log->object_id = $procedure->id;
